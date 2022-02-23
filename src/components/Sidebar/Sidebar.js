@@ -96,7 +96,7 @@ Entry 3
 
           <div>
             <input type="checkbox" id="remove-winners" name="remove-winners"></input>
-            <label for="remove-winners"> Remove winners in entry list</label>
+            <label for="remove-winners"> Remove entry of previous winners</label>
           </div>
         </div>
 
