@@ -6,7 +6,7 @@ function EntriesContainer(){
   const {entries} = useContext(AppContext);
 
   useEffect(() => {
-    const container = document.getElementById('raffle-container');
+    const container = document.getElementById('raffle');
 
     if(container){
       const size = Math.floor(Math.sqrt(entries.length))
@@ -17,7 +17,7 @@ function EntriesContainer(){
   }, [entries])
 
   return(
-    <div id="raffle-container">
+    <div id="raffle">
       {
         entries.map((entry, id) => {
           return (

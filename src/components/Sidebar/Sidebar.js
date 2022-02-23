@@ -6,7 +6,19 @@ function Sidebar(){
   const ref = useRef();
   const {entries, winners, setEntries, setWinners} = useContext(AppContext);
   
+  const introduction=
+  `Welcome to Raffler!
+
+Place entries separated by a new line in this section.
+
+Example:
+Entry 1
+Entry 2
+Entry 3
+  `
+
   const handleClick = () => {
+    window.location.href = '#raffle';
     const elEntries = document.querySelectorAll('.entry');
 
     // Reset highlighted entries
@@ -73,12 +85,18 @@ function Sidebar(){
       <div id="sidebar-content">
         <div id="input-area">
           <h3>Entries <span id="count">({entries.length})</span></h3>
-          <textarea name="entries" onChange={handleInputChange} ref={ref}></textarea>
+          <textarea
+            name="entries"
+            onChange={handleInputChange}
+            ref={ref}
+            placeholder={introduction}>
+
+          </textarea>
           <button id="pick" onClick={handleClick}>Pick</button>
 
           <div>
             <input type="checkbox" id="remove-winners" name="remove-winners"></input>
-            <label for="remove-winners"> Remove winners?</label>
+            <label for="remove-winners"> Remove winners in entry list</label>
           </div>
         </div>
 

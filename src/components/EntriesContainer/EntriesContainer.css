@@ -1,47 +1,45 @@
-div#header, div#raffle-container {
-    padding-top: 32px;
-    padding-left: 32px;
-    padding-bottom: 16px;
-  }
+div#raffle {
+    padding: 32px;
+}
   
-  div#raffle-container {
-    display: grid;
-    grid-gap: 1rem;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    height: 100vh;
-  }
-  
-  div.entry {
-    color: var(--neutral-dark);
-    padding: 4px;
-    height:100%;
-    background-color: var(--background-fore);
-    border: 1px solid var(--neutral);
-    border-radius: 0.25rem;
-    overflow: hidden;
-  
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  div.highlight {
-    color: var(--primary);
-    border-color: var(--primary);
-    border: 2px solid;
-    transition: 0.25s;
-    font-weight: bold;
-  }
-  
-  @keyframes highlight-fade {
-    0% {color: var(--neutral-dark); border-color: var(--neutral)}
-    50% {color: var(--primary); border-color: var(--primary)}
-    100% {color: var(--neutral-dark); border-color: var(--neutral)}
-  }
-  
-  @keyframes highlight-win {
-    0% {color: var(--neutral-dark); border-color: var(--neutral);}
-    100% {color: var(--neutral-dark); border-color: transparent;}
-  }
+div#raffle {
+  display: grid;
+  grid-gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+}
+
+div.entry {
+  color: var(--neutral-dark);
+  padding: 4px;
+  height:100%;
+  background-color: var(--background-fore);
+  border: 1px solid var(--neutral);
+  border-radius: 0.25rem;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+div.highlight {
+  color: var(--primary);
+  border-color: var(--primary);
+  border: 2px solid;
+  transition: 0.25s;
+  font-weight: bold;
+}
+
+@keyframes highlight-fade {
+  0% {color: var(--neutral-dark); border-color: var(--neutral);}
+  50% {color: var(--primary); border-color: var(--primary);}
+  100% {color: var(--neutral-dark); border-color: var(--neutral);}
+}
+
+@keyframes highlight-win {
+  0% {color: var(--neutral-dark); border-color: var(--neutral); background-color: var(--background-fore);}
+  100% {color: var(--neutral-dark); border-color: transparent; background-color: var(--background-main)}
+}
