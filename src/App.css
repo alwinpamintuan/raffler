@@ -27,7 +27,7 @@ div#sidebar, div#raffle-container {
 
 div#sidebar {
   background: #070e13;
-  width: 25vw;
+  width: 20vw;
   height: inherit;
   overflow: hidden;
 
@@ -35,9 +35,19 @@ div#sidebar {
   flex-direction: column;
 }
 
-div#sidebar textarea {
+div#input-area {
+  padding-top: 16px;
+  height: 50vh;
+
+  display: flex;
+  flex-direction: column;
+}
+
+div#input-area textarea {
   resize: none;
   width: 100%;
+  border-radius: 0.33rem;
+  flex-grow: 1;
 }
 
 div#raffle-container {
@@ -49,6 +59,17 @@ div#raffle-container {
   height: 100vh;
 }
 
+div#winners {
+  padding-top: 16px;
+  height: 35vh;
+  color: rgb(209, 209, 209);
+}
+
+ul#recent-winners {
+  max-height: 27vh;
+  overflow: auto;
+}
+
 div.entry {
   color: gray;
   padding: 4px;
@@ -56,13 +77,31 @@ div.entry {
   background-color: #070e13;
   border: 1px solid transparent;
   border-radius: 0.25rem;
-
   overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 div.highlight {
   color: orange;
   border-color: orange;
+}
+
+#pick {
+  width: 100%;
+  border: none;
+  background-color: black;
+  color: rgb(209, 209, 209);
+  padding: 8px;
+  border-radius: 0.25rem;
+}
+
+#pick:hover {
+  color: white;
+  background-image: linear-gradient(to right, #0e1a22, #1c323f);
+  transition: 200ms;
 }
 
 @keyframes highlight-fade {

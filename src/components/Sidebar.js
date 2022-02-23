@@ -3,8 +3,7 @@ import {AppContext} from '../context/AppContext';
 
 function Sidebar(){
   const ref = useRef();
-  const {entries, setEntries} = useContext(AppContext);
-  const [winner, setWinner] = useState(null);
+  const {entries, winners, setEntries, setWinners} = useContext(AppContext);
   
   const handleClick = () => {
     const elEntries = document.querySelectorAll('.entry');
@@ -32,7 +31,7 @@ function Sidebar(){
           })
           elEntries[num].classList.add('highlight');
 
-          setWinner(elEntries[num])
+          setWinners([...winners, elEntries[num].textContent])
 
         }else{
           elEntries[num].style.animation = 'highlight-fade 1s 1';
@@ -57,10 +56,25 @@ function Sidebar(){
   return(
     <div id="sidebar">
       <h1>Randomizer</h1>
-      <h3>Input</h3>
-      <textarea name="entries" rows="20" onChange={handleInputChange} ref={ref}></textarea>
-      <button onClick={handleClick}>Pick</button>
-      <h3>{winner!==null? winner.textContent : ''}</h3>
+      
+      <div id="input-area">
+        <h3>Entries <span>({entries.length})</span></h3>
+        <textarea name="entries" onChange={handleInputChange} ref={ref}></textarea>
+        <button id="pick" onClick={handleClick}>Pick</button>
+      </div>
+
+      <div id="winners">
+        <h3>Recent winners:</h3>
+        <ul id="recent-winners">
+          {
+            winners.slice(0, winners.length).reverse().map(winner => {
+              return(
+                <li>{winner}</li>
+              )
+            })
+          }
+        </ul>
+      </div>
     </div>
   )
 }
