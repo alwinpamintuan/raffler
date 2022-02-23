@@ -18,6 +18,13 @@ function Sidebar(){
       }
     }
 
+    // Remove previous winner from entry if option is toggled
+    const removeToggle = document.getElementById('remove-winners');
+    if(removeToggle.checked){
+      entries.splice(winners[winners.length-1].idx, 1);
+      setEntries([...entries]);
+    }
+
     // Get 1000 random integers for "random choosing" effect then animate for 5 seconds
     const rSize = 1000;
     const time = 5;
@@ -32,7 +39,10 @@ function Sidebar(){
           })
           elEntries[num].classList.add('highlight');
 
-          setWinners([...winners, elEntries[num].textContent])
+          setWinners([...winners, {
+            name: elEntries[num].textContent,
+            idx: num
+          }])
 
         }else{
           elEntries[num].style.animation = 'highlight-fade 1s 1';
@@ -65,6 +75,11 @@ function Sidebar(){
           <h3>Entries <span id="count">({entries.length})</span></h3>
           <textarea name="entries" onChange={handleInputChange} ref={ref}></textarea>
           <button id="pick" onClick={handleClick}>Pick</button>
+
+          <div>
+            <input type="checkbox" id="remove-winners" name="remove-winners"></input>
+            <label for="remove-winners"> Remove winners?</label>
+          </div>
         </div>
 
         <div id="winners">
@@ -73,7 +88,7 @@ function Sidebar(){
             {
               winners.slice(0, winners.length).reverse().map(winner => {
                 return(
-                  <li>{winner}</li>
+                  <li>{winner.name}</li>
                 )
               })
             }
