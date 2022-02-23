@@ -1,38 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800;900&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Work Sans', sans-serif;
+}
+
+body {
+  background: #091217;
+  height: 100vh;
+}
+
+h1, h3, p.entry {
+  color: orange;
+}
+
 .App {
-  text-align: center;
+  display: flex;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+div#sidebar, div#raffle-container {
+  padding: 16px;
+  height: 100%;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
+div#sidebar {
+  background: #070e13;
+  width: 25vw;
+  height: inherit;
+  overflow: hidden;
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+div#sidebar textarea {
+  resize: none;
+  width: 100%;
+}
+
+div#raffle-container {
+  display: grid;
+  grid-gap: 0.5rem;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  width: 100%;
+  height: 100vh;
 }
 
-.App-link {
-  color: #61dafb;
+div.entry {
+  color: gray;
+  padding: 4px;
+  height:100%;
+  background-color: #070e13;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+
+  overflow: hidden;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+div.highlight {
+  color: orange;
+  border-color: orange;
+}
+
+@keyframes highlight-fade {
+  0% {color: gray;}
+  50% {color: white;}
+  100% {color: gray;}
+}
+
+@keyframes highlight-win {
+  0% {color: orange; border-color: orange;}
+  100% {color: white; border-color: transparent;}
 }
