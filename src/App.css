@@ -1,19 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Oswald:wght@400;500;700&display=swap');
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Work Sans', sans-serif;
 }
 
 :root {
-  --primary: #66fcf1;
-  --secondary: #45a29e;
+  --primary: #f04f3c;
+  --secondary: #be200e;
   --neutral: #c5c6c7;
   --neutral-dark: #6b6b6b;
-  --background-main: #1f2833;
-  --background-fore: #0b0c10;
+  --background-main: #fff;
+  --background-fore: #f5f6ff;
+  --text: #172038;
 }
 
 body {
@@ -23,24 +23,48 @@ body {
 
 h1 {
   color: var(--primary);
+  font-family: 'Oswald', sans-serif;
 }
 
 h3 {
-  color: var(--neutral)
+  color: var(--text);
+  font-family: 'Oswald', sans-serif;
+}
+
+p {
+  color: var(--text);
+  font-family: 'Lora', sans-serif;
 }
 
 .App {
   display: flex;
 }
 
-div#sidebar, div#raffle-container {
-  padding: 16px;
-  height: 100%;
+div#sidebar {
+  background-color: var(--background-fore);
+  width: 25vw;
 }
 
-div#sidebar {
-  background: var(--background-fore);
-  width: 20vw;
+div#header {
+  background-color: #172038;
+}
+
+div#raffle-container {
+  padding: 32px;
+}
+
+div#header, div#raffle-container {
+  padding-top: 32px;
+  padding-left: 32px;
+  padding-bottom: 16px;
+}
+
+div#sidebar-content {
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+div#sidebar-content {
   height: inherit;
   overflow: hidden;
 
@@ -59,13 +83,14 @@ div#input-area {
 div#input-area textarea {
   resize: none;
   width: 100%;
+  border: none;
   border-radius: 0.33rem;
   flex-grow: 1;
 }
 
 div#raffle-container {
   display: grid;
-  grid-gap: 0.5rem;
+  grid-gap: 1rem;
   justify-content: space-between;
   align-items: center;
   width: 100%;
@@ -81,15 +106,15 @@ div#winners {
 ul#recent-winners {
   max-height: 27vh;
   overflow: auto;
-  color: var(--neutral-dark)
+  color: var(--text)
 }
 
 div.entry {
   color: var(--neutral-dark);
   padding: 4px;
   height:100%;
-  background-color: #070e13;
-  border: 1px solid transparent;
+  background-color: var(--background-fore);
+  border: 1px solid var(--neutral);
   border-radius: 0.25rem;
   overflow: hidden;
 
@@ -101,20 +126,23 @@ div.entry {
 div.highlight {
   color: var(--primary);
   border-color: var(--primary);
+  border: 2px solid;
+  transition: 0.25s;
+  font-weight: bold;
 }
 
 #pick {
   width: 100%;
   border: none;
-  background-color: black;
-  color: var(--neutral-dark);
+  background-color: var(--primary);
+  color: #fff;
   padding: 8px;
   border-radius: 0.25rem;
 }
 
 #pick:hover {
-  color: white;
-  background-image: linear-gradient(to right, #0e1a22, #1c323f);
+  color: #fff;
+  background-color: var(--secondary);
   transition: 200ms;
 }
 
@@ -123,9 +151,9 @@ div.highlight {
 }
 
 @keyframes highlight-fade {
-  0% {color: var(--neutral-dark);}
-  50% {color: var(--primary);}
-  100% {color: var(--neutral-dark);}
+  0% {color: var(--neutral-dark); border-color: var(--neutral)}
+  50% {color: var(--primary); border-color: var(--primary)}
+  100% {color: var(--neutral-dark); border-color: var(--neutral)}
 }
 
 @keyframes highlight-win {

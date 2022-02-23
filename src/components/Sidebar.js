@@ -55,25 +55,29 @@ function Sidebar(){
 
   return(
     <div id="sidebar">
-      <h1>Randomizer</h1>
-      
-      <div id="input-area">
-        <h3>Entries <span id="count">({entries.length})</span></h3>
-        <textarea name="entries" onChange={handleInputChange} ref={ref}></textarea>
-        <button id="pick" onClick={handleClick}>Pick</button>
+      <div id="header">
+        <h1>RAFFLER</h1>
       </div>
 
-      <div id="winners">
-        <h3>Recent winners:</h3>
-        <ul id="recent-winners">
-          {
-            winners.slice(0, winners.length).reverse().map(winner => {
-              return(
-                <li>{winner}</li>
-              )
-            })
-          }
-        </ul>
+      <div id="sidebar-content">
+        <div id="input-area">
+          <h3>Entries <span id="count">({entries.length})</span></h3>
+          <textarea name="entries" onChange={handleInputChange} ref={ref}></textarea>
+          <button id="pick" onClick={handleClick}>Pick</button>
+        </div>
+
+        <div id="winners">
+          <h3>Recent winners:</h3>
+          <ul id="recent-winners">
+            {
+              winners.slice(0, winners.length).reverse().map(winner => {
+                return(
+                  <li>{winner}</li>
+                )
+              })
+            }
+          </ul>
+        </div>
       </div>
     </div>
   )
