@@ -39,3 +39,14 @@ p {
 .App {
   display: flex;
 }
+
+@media (orientation: portrait) {
+  .App {
+    flex-direction: column;
+  }
+
+  div#sidebar, div#raffle {
+    width: 100vw;
+    height: 100vh;
+  }
+}
