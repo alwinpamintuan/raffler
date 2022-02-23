@@ -7,13 +7,26 @@
   font-family: 'Work Sans', sans-serif;
 }
 
+:root {
+  --primary: #66fcf1;
+  --secondary: #45a29e;
+  --neutral: #c5c6c7;
+  --neutral-dark: #6b6b6b;
+  --background-main: #1f2833;
+  --background-fore: #0b0c10;
+}
+
 body {
-  background: #091217;
+  background: var(--background-main);
   height: 100vh;
 }
 
-h1, h3, p.entry {
-  color: orange;
+h1 {
+  color: var(--primary);
+}
+
+h3 {
+  color: var(--neutral)
 }
 
 .App {
@@ -26,7 +39,7 @@ div#sidebar, div#raffle-container {
 }
 
 div#sidebar {
-  background: #070e13;
+  background: var(--background-fore);
   width: 20vw;
   height: inherit;
   overflow: hidden;
@@ -62,16 +75,17 @@ div#raffle-container {
 div#winners {
   padding-top: 16px;
   height: 35vh;
-  color: rgb(209, 209, 209);
+  color: var(--neutral);
 }
 
 ul#recent-winners {
   max-height: 27vh;
   overflow: auto;
+  color: var(--neutral-dark)
 }
 
 div.entry {
-  color: gray;
+  color: var(--neutral-dark);
   padding: 4px;
   height:100%;
   background-color: #070e13;
@@ -85,15 +99,15 @@ div.entry {
 }
 
 div.highlight {
-  color: orange;
-  border-color: orange;
+  color: var(--primary);
+  border-color: var(--primary);
 }
 
 #pick {
   width: 100%;
   border: none;
   background-color: black;
-  color: rgb(209, 209, 209);
+  color: var(--neutral-dark);
   padding: 8px;
   border-radius: 0.25rem;
 }
@@ -104,13 +118,17 @@ div.highlight {
   transition: 200ms;
 }
 
+#count {
+  color: var(--neutral-dark)
+}
+
 @keyframes highlight-fade {
-  0% {color: gray;}
-  50% {color: white;}
-  100% {color: gray;}
+  0% {color: var(--neutral-dark);}
+  50% {color: var(--primary);}
+  100% {color: var(--neutral-dark);}
 }
 
 @keyframes highlight-win {
-  0% {color: orange; border-color: orange;}
+  0% {color: var(--neutral-dark); border-color: var(--neutral);}
   100% {color: white; border-color: transparent;}
 }

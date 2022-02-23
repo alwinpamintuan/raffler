@@ -58,7 +58,7 @@ function Sidebar(){
       <h1>Randomizer</h1>
       
       <div id="input-area">
-        <h3>Entries <span>({entries.length})</span></h3>
+        <h3>Entries <span id="count">({entries.length})</span></h3>
         <textarea name="entries" onChange={handleInputChange} ref={ref}></textarea>
         <button id="pick" onClick={handleClick}>Pick</button>
       </div>
