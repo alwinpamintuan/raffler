@@ -1,5 +1,6 @@
 import React, {useContext, useEffect} from 'react';
-import {AppContext} from '../context/AppContext'
+import {AppContext} from '../../context/AppContext'
+import './EntriesContainer.css'
 
 function EntriesContainer(){
   const {entries} = useContext(AppContext);

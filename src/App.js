@@ -1,6 +1,6 @@
 import { AppContextProvider } from './context/AppContext';
-import Sidebar from './components/Sidebar';
-import EntriesContainer from './components/EntriesContainer';
+import Sidebar from './components/Sidebar/Sidebar';
+import EntriesContainer from './components/EntriesContainer/EntriesContainer';
 import './App.css';
 
 function App() {

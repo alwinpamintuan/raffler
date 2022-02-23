@@ -1,5 +1,6 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
-import {AppContext} from '../context/AppContext';
+import React, {useContext, useEffect, useRef} from 'react';
+import {AppContext} from '../../context/AppContext';
+import './Sidebar.css'
 
 function Sidebar(){
   const ref = useRef();
