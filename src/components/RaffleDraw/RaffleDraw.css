@@ -24,8 +24,6 @@ div.entry {
 }
 
 div.entry:hover {
-  position: relative;
-  z-index: 999999999;
   overflow: visible;
 
   border: 3px solid var(--text);
