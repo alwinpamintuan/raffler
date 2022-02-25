@@ -56,21 +56,6 @@ ul#recent-winners {
   color: var(--text)
 }
 
-#pick {
-  width: 100%;
-  border: none;
-  background-color: var(--primary);
-  color: #fff;
-  padding: 8px;
-  border-radius: 0.25rem;
-}
-
-#pick:hover {
-  color: #fff;
-  background-color: var(--secondary);
-  transition: 200ms;
-}
-
 #count {
   color: var(--neutral-dark)
 }

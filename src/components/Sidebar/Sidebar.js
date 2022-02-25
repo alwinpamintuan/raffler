@@ -1,10 +1,11 @@
 import React, {useContext, useEffect, useRef} from 'react';
 import {AppContext} from '../../context/AppContext';
-import './Sidebar.css'
+import RaffleButton from '../RaffleButton/RaffleButton.js';
+import './Sidebar.css';
 
 function Sidebar(){
   const ref = useRef();
-  const {entries, winners, setEntries, setWinners} = useContext(AppContext);
+  const {entries, winners, setEntries} = useContext(AppContext);
   
   const introduction=
   `Welcome to Raffler!
@@ -16,56 +17,6 @@ Entry 1
 Entry 2
 Entry 3
   `
-
-  const handleClick = () => {
-    window.location.href = '#raffle';
-    const elEntries = document.querySelectorAll('.entry');
-
-    // Reset highlighted entries
-    const prevWinner = document.querySelectorAll('.highlight');
-    if(prevWinner){
-      for(const el of prevWinner){
-        el.classList.remove('highlight');
-      }
-    }
-
-    // Remove previous winner from entry if option is toggled
-    const removeToggle = document.getElementById('remove-winners');
-    if(removeToggle.checked){
-      entries.splice(winners[winners.length-1].idx, 1);
-      setEntries([...entries]);
-    }
-
-    // Get 1000 random integers for "random choosing" effect then animate for 5 seconds
-    const rSize = 1000;
-    const time = 5;
-    let randomNumbers = new Array(rSize).fill(0).map((v) => Math.floor(Math.random() * entries.length));
-    randomNumbers.forEach((num,i) => {
-      
-      setTimeout(() => {  
-        if(i === rSize-1){
-          elEntries[num].style.animation = 'highlight-win 0.33s 3';
-          elEntries[num].addEventListener('animationend', (e) => {
-            elEntries[num].style.removeProperty('animation');
-          })
-          elEntries[num].classList.add('highlight');
-
-          setWinners([...winners, {
-            name: elEntries[num].textContent,
-            idx: num
-          }])
-
-        }else{
-          elEntries[num].style.animation = 'highlight-fade 1s 1';
-          elEntries[num].addEventListener('animationend', (e) => {
-            elEntries[num].style.removeProperty('animation');
-          })
-        }
-
-      }, time*i)
-
-    })
-  }
   
   const handleInputChange = () => {
     setEntries(ref.current.value.split("\n").filter(s => s !== ''))
@@ -85,13 +36,13 @@ Entry 3
         <div id="input-area">
           <h3>Entries <span id="count">({entries.length})</span></h3>
           <textarea
+            id="entry-field"
             name="entries"
             onChange={handleInputChange}
             ref={ref}
             placeholder={introduction}>
-
           </textarea>
-          <button id="pick" onClick={handleClick}>Pick</button>
+          <RaffleButton/>
 
           <div>
             <input type="checkbox" id="remove-winners" name="remove-winners"></input>

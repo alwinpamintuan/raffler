@@ -1,0 +1,21 @@
+#pick {
+  width: 100%;
+  border: none;
+  background-color: var(--primary);
+  color: #fff;
+  padding: 8px;
+  border-radius: 0.25rem;
+  transition: 0.5s;
+}
+
+button#pick:disabled {
+  background-color: var(--text);
+  color: var(--background-fore);
+  transition: 0.5s;
+}
+
+#pick:hover {
+  color: #fff;
+  background-color: var(--secondary);
+  transition: 200ms;
+}
