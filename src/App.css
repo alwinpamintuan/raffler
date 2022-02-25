@@ -16,6 +16,10 @@
   --text: #172038;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--background-main);
   height: 100vh;
