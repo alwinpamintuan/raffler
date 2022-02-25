@@ -1,21 +1,14 @@
-div {
-  box-sizing: border-box;
-}
-
-div#raffle {
-    padding: 32px;
-}
-  
 div#raffle {
   display: grid;
   grid-gap: 1rem;
   grid-auto-rows: 1fr;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
-  height: 100vh;
-}
 
+  height: 100%;
+  width: 100%;
+}
+  
 div.entry {
   color: var(--neutral-dark);
   height:100%;

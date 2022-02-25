@@ -1,6 +1,6 @@
 import { AppContextProvider } from './context/AppContext';
 import Sidebar from './components/Sidebar/Sidebar';
-import EntriesContainer from './components/EntriesContainer/EntriesContainer';
+import Main from './components/Main/Main';
 import './App.css';
 
 function App() {
@@ -8,7 +8,7 @@ function App() {
     <AppContextProvider>
       <div className="App">
         <Sidebar/>
-        <EntriesContainer/>
+        <Main/>
       </div>
     </AppContextProvider>
   );

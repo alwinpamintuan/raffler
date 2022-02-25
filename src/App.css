@@ -8,7 +8,7 @@
 
 :root {
   --primary: #f04f3c;
-  --secondary: #be200e;
+  --secondary: #9c271a;
   --neutral: #c5c6c7;
   --neutral-dark: #6b6b6b;
   --background-main: #fff;
@@ -49,8 +49,12 @@ p {
     flex-direction: column;
   }
 
-  div#sidebar, div#raffle {
-    width: 100vw;
-    height: 100vh;
+  div#sidebar, div#raffle, div#home {
+    width: 100%;
+    height: 100%;
+  }
+
+  div#main {
+    border-top: 1px solid var(--neutral);
   }
 }

@@ -1,10 +1,15 @@
 import React, {useContext, useEffect} from 'react';
 import {AppContext} from '../../context/AppContext'
-import './EntriesContainer.css'
+import './RaffleDraw.css';
 
-function EntriesContainer(){
+function RaffleDraw(){
   const {entries} = useContext(AppContext);
 
+  // Update background color to white
+  const main = document.getElementById("main");
+  main.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--background-main');
+
+  // Show entries
   useEffect(() => {
     const container = document.getElementById('raffle');
 
@@ -19,9 +24,9 @@ function EntriesContainer(){
   return(
     <div id="raffle">
       {
-        entries.map((entry, id) => {
+        entries.map((entry, idx) => {
           return (
-            <div className="entry" key={id}>
+            <div className="entry" key={idx}>
               {entry}
             </div>
           )
@@ -31,4 +36,4 @@ function EntriesContainer(){
   )
 }
 
-export default EntriesContainer;
+export default RaffleDraw;

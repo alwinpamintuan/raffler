@@ -1,0 +1,27 @@
+div#home {
+  width: 50%;
+}
+
+div#home h1 {
+  font-size: 2.5rem;
+  line-height: 3rem;;
+}
+
+div#home h3 {
+  letter-spacing: 0.2rem;
+  line-height: 3.75rem;
+  text-decoration: underline;
+  text-underline-offset: 0.5rem;
+  color: #575d75;
+}
+
+div#home p {
+  margin-top: 1rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+div#home a {
+  color: var(--secondary);
+  text-decoration: none;
+}

@@ -24,7 +24,6 @@ Entry 3
     // Reset highlighted entries
     const prevWinner = document.querySelectorAll('.highlight');
     if(prevWinner){
-      console.log(prevWinner)
       for(const el of prevWinner){
         el.classList.remove('highlight');
       }
@@ -96,7 +95,7 @@ Entry 3
 
           <div>
             <input type="checkbox" id="remove-winners" name="remove-winners"></input>
-            <label for="remove-winners"> Remove entry of previous winners</label>
+            <label htmlFor="remove-winners"> Remove entry of previous winners</label>
           </div>
         </div>
 
@@ -104,9 +103,9 @@ Entry 3
           <h3>Recent winners:</h3>
           <ul id="recent-winners">
             {
-              winners.slice(0, winners.length).reverse().map(winner => {
+              winners.slice(0, winners.length).reverse().map((winner, idx) => {
                 return(
-                  <li>{winner.name}</li>
+                  <li key={idx}>{winner.name}</li>
                 )
               })
             }
