@@ -4,11 +4,7 @@ import './RaffleDraw.css';
 
 function RaffleDraw(){
   const {entries} = useContext(AppContext);
-
-  // Update background color to white
-  const main = document.getElementById("main");
-  main.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--background-main');
-
+  
   // Show entries
   useEffect(() => {
     const container = document.getElementById('raffle');

@@ -10,11 +10,15 @@ function Main(){
   
   useEffect(() => {
     if(entries.length === 0) setBg('--background-fore');
-    else setBg(setBg('--background-main'));
+    else setBg('--background-main)');
   }, [entries])
 
+  useEffect(() => {
+
+  }, [bg])
+
   return(
-    <div id="main" style={{backgroundColor: bg}}>{
+    <div id="main" style={{backgroundColor: `var(${bg})`}}>{
       entries.length === 0
         ? <Home/>
         : <RaffleDraw/>
