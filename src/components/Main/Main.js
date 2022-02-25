@@ -10,7 +10,7 @@ function Main(){
   
   useEffect(() => {
     if(entries.length === 0) setBg('--background-fore');
-    else setBg('--background-main)');
+    else setBg('--background-main');
   }, [entries])
 
   useEffect(() => {
