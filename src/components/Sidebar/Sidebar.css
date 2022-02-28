@@ -42,6 +42,12 @@ div#input-area textarea {
   border: none;
   border-radius: 0.33rem;
   flex-grow: 1;
+  transition: 0.25s;
+}
+
+div#input-area textarea:focus {
+  padding: 0.5rem;
+  transition: 0.25s;
 }
 
 div#winners {
