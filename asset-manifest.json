@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/raffler/static/css/main.f040f54d.css",
-    "main.js": "/raffler/static/js/main.317dc3c1.js",
+    "main.css": "/raffler/static/css/main.79e2a2f6.css",
+    "main.js": "/raffler/static/js/main.e72f853e.js",
     "index.html": "/raffler/index.html",
-    "main.f040f54d.css.map": "/raffler/static/css/main.f040f54d.css.map",
-    "main.317dc3c1.js.map": "/raffler/static/js/main.317dc3c1.js.map"
+    "main.79e2a2f6.css.map": "/raffler/static/css/main.79e2a2f6.css.map",
+    "main.e72f853e.js.map": "/raffler/static/js/main.e72f853e.js.map"
   },
   "entrypoints": [
-    "static/css/main.f040f54d.css",
-    "static/js/main.317dc3c1.js"
+    "static/css/main.79e2a2f6.css",
+    "static/js/main.e72f853e.js"
   ]
 }
