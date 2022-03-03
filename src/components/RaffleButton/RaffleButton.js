@@ -12,11 +12,12 @@ function RaffleButton(){
       return;
     }
     
+    document.getElementById('main').scrollIntoView(true);
+
     // Disable button while "picking"
     const pickBtn = document.getElementById("pick");
     pickBtn.disabled = true;
     pickBtn.textContent = "Picking...";
-    window.location.href = '#raffle';
 
     // Enable button after "picking" and remove animation of winning entry
     const endRaffleDraw = (num) => {
