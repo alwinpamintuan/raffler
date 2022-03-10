@@ -46,7 +46,7 @@ Entry 3
 
           <div>
             <input type="checkbox" id="remove-winners" name="remove-winners" defaultChecked></input>
-            <label htmlFor="remove-winners"> Remove entry of previous winners</label>
+            <label htmlFor="remove-winners"> Remove entry of previous winner</label>
           </div>
         </div>
 
