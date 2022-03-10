@@ -39,6 +39,14 @@ function RaffleButton(){
     if(removeToggle.checked && winners.length !== 0){
       entries.splice(winners[winners.length-1].idx, 1);
       setEntries([...entries]);
+
+      // Remove from textarea
+      const textareaElem = document.getElementById("entry-field");
+      if(textareaElem){
+        const entryList = textareaElem.value.split(/\r?\n/);
+        entryList.splice(winners[winners.length-1].idx, 1);
+        textareaElem.value = entryList.join('\r\n') + '\r\n';
+      }
     }
 
     // Get 1000 random integers for "random choosing" effect then animate for 5 seconds
