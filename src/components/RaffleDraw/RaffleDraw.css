@@ -23,14 +23,14 @@ div.entry {
   justify-content: center;
 }
 
-div.entry:hover {
+/* div.entry:hover {
   overflow: visible;
 
   border: 3px solid var(--text);
   color: var(--text);
   background-color: white;
   transition: 0.25s;
-}
+} */
 
 div.highlight {
   color: var(--primary);

@@ -45,7 +45,7 @@ Entry 3
           <RaffleButton/>
 
           <div>
-            <input type="checkbox" id="remove-winners" name="remove-winners"></input>
+            <input type="checkbox" id="remove-winners" name="remove-winners" defaultChecked></input>
             <label htmlFor="remove-winners"> Remove entry of previous winners</label>
           </div>
         </div>

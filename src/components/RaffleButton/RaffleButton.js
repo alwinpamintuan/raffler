@@ -20,7 +20,7 @@ function RaffleButton(){
     pickBtn.textContent = "Picking...";
 
     // Enable button after "picking" and remove animation of winning entry
-    const endRaffleDraw = (num) => {
+    const endRaffleDraw = () => {
       pickBtn.disabled = false;
       pickBtn.textContent = "Pick";
     }
@@ -36,7 +36,7 @@ function RaffleButton(){
 
     // Remove previous winner from entry if option is toggled
     const removeToggle = document.getElementById('remove-winners');
-    if(removeToggle.checked){
+    if(removeToggle.checked && winners.length !== 0){
       entries.splice(winners[winners.length-1].idx, 1);
       setEntries([...entries]);
     }
