@@ -4,8 +4,8 @@
   "theme_color": "#f69435",
   "background_color": "#ffffff",
   "display": "standalone",
-  "scope": "/",
-  "start_url": "/",
+  "scope": "/raffler/",
+  "start_url": "/raffler/",
   "prefer_related_applications": true,
   "icons": [
     {
