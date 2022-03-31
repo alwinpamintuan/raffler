@@ -4,10 +4,16 @@
   "theme_color": "#f69435",
   "background_color": "#ffffff",
   "display": "standalone",
-  "scope": "/",
-  "start_url": "/",
+  "scope": "/raffler/",
+  "start_url": "/raffler/",
   "prefer_related_applications": true,
   "icons": [
+    {
+      "src": "maskable_icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
     {
       "src": "windows11/SmallTile.scale-100.png",
       "sizes": "71x71"
