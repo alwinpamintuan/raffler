@@ -1,24 +1,22 @@
-div#home {
-  width: 50%;
-}
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&family=Open+Sans:wght@400;500;700&family=PT+Serif&display=swap");
 
-div#home h1 {
-  font-size: 2.5rem;
-  line-height: 3rem;;
+div#home {
+  padding-right: 25%;
 }
 
 div#home h3 {
-  letter-spacing: 0.2rem;
-  line-height: 3.75rem;
+  letter-spacing: 2.625px;
+  line-height: 24px;
   text-decoration: underline;
-  text-underline-offset: 0.5rem;
-  color: #575d75;
+  text-underline-offset: 16px;
+  margin-bottom: 16px;
+  color: #6c6f8b;
+  font-family: "Open Sans", sans-serif;
+  font-size: 14px;
 }
 
 div#home p {
-  margin-top: 1rem;
-  font-size: 1rem;
-  line-height: 1.5rem;
+  margin-top: 16px;
 }
 
 div#home a {

@@ -1,21 +1,31 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&family=Open+Sans:wght@400;500;700&family=PT+Serif&display=swap");
+
 #pick {
   width: 100%;
   border: none;
-  background-color: var(--primary);
+  background-color: var(--text);
   color: #fff;
-  padding: 8px;
-  border-radius: 0.25rem;
-  transition: 0.5s;
+  transition: 0.25s;
+
+  font-family: "Open Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  height: 48px;
+  letter-spacing: 2.625px;
+  line-height: 24px;
+
+  padding: 12px;
+  margin-bottom: 12px;
 }
 
 button#pick:disabled {
   background-color: var(--text);
   color: var(--background-fore);
-  transition: 0.5s;
+  transition: 0.25s;
 }
 
 #pick:hover {
   color: #fff;
-  background-color: var(--secondary);
+  background-color: #50558b;
   transition: 200ms;
 }

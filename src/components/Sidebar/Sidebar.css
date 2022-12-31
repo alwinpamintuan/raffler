@@ -1,36 +1,18 @@
 div#sidebar {
   background-color: var(--background-fore);
-  width: 25vw;
   overflow: hidden;
-}
+  width: 100%;
 
-div#header {
-  background-color: #172038;
-  padding-top: 32px;
-  padding-left: 32px;
-  padding-bottom: 16px;
-}
-
-div#raffle-container {
-  padding: 32px;
-}
-
-div#sidebar-content {
   padding-left: 32px;
   padding-right: 32px;
-}
-  
-div#sidebar-content {
-  height: inherit;
-  overflow: hidden;
 
   display: flex;
   flex-direction: column;
 }
-  
+
 div#input-area {
+  flex-grow: 1;
   padding-top: 16px;
-  height: 50vh;
 
   display: flex;
   flex-direction: column;
@@ -38,30 +20,36 @@ div#input-area {
 
 div#input-area textarea {
   resize: none;
-  width: 100%;
   border: none;
-  border-radius: 0.33rem;
-  flex-grow: 1;
+  width: 100%;
+
   transition: 0.25s;
+  flex-grow: 1;
+
+  background-color: var(--background-fore);
+  color: var(--text);
+
+  padding-top: 12px;
+  margin-bottom: 12px;
 }
 
 div#input-area textarea:focus {
   padding: 0.5rem;
-  transition: 0.25s;
+  transition: all 0.25s;
+  background-color: var(--background-main);
 }
 
 div#winners {
+  flex-grow: 1;
   padding-top: 16px;
-  height: 35vh;
   color: var(--neutral);
 }
 
 ul#recent-winners {
-  max-height: 27vh;
   overflow: auto;
-  color: var(--text)
+  color: var(--text);
 }
 
 #count {
-  color: var(--neutral-dark)
+  color: var(--neutral-dark);
 }

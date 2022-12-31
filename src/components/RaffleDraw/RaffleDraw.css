@@ -1,36 +1,24 @@
 div#raffle {
   display: grid;
-  grid-gap: 1rem;
+  grid-gap: 2rem;
   grid-auto-rows: 1fr;
   justify-content: space-between;
   align-items: center;
-
-  height: 100%;
-  width: 100%;
 }
-  
+
 div.entry {
   color: var(--neutral-dark);
-  height:100%;
   padding: 8px;
   background-color: var(--background-fore);
   border: 1px solid var(--neutral);
-  border-radius: 0.25rem;
   overflow: hidden;
 
   display: flex;
   align-items: center;
   justify-content: center;
+
+  height: 100%;
 }
-
-/* div.entry:hover {
-  overflow: visible;
-
-  border: 3px solid var(--text);
-  color: var(--text);
-  background-color: white;
-  transition: 0.25s;
-} */
 
 div.highlight {
   color: var(--primary);
@@ -43,12 +31,29 @@ div.highlight {
 }
 
 @keyframes highlight-fade {
-  0% {color: var(--neutral-dark); border: 1px solid var(--neutral);}
-  50% {color: var(--text); border: 4px solid var(--neutral);}
-  100% {color: var(--neutral-dark); border: 1px solid var(--neutral);}
+  0% {
+    color: var(--neutral-dark);
+    border: 1px solid var(--neutral);
+  }
+  50% {
+    color: var(--text);
+    border: 4px solid var(--neutral);
+  }
+  100% {
+    color: var(--neutral-dark);
+    border: 1px solid var(--neutral);
+  }
 }
 
 @keyframes highlight-win {
-  0% {color: var(--neutral-dark); border-color: var(--neutral); background-color: var(--background-fore);}
-  100% {color: var(--neutral-dark); border-color: transparent; background-color: var(--background-main)}
+  0% {
+    color: var(--neutral-dark);
+    border-color: var(--neutral);
+    background-color: var(--background-fore);
+  }
+  100% {
+    color: var(--neutral-dark);
+    border-color: transparent;
+    background-color: var(--background-main);
+  }
 }
