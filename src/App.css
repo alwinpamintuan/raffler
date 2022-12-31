@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Oswald:wght@400;500;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Open+Sans:wght@400;500;700&family=PT+Serif&display=swap");
 
 * {
   box-sizing: border-box;
@@ -7,10 +7,10 @@
 }
 
 :root {
-  --primary: #f04f3c;
-  --secondary: #9c271a;
+  --primary: #ff5f1b;
+  --secondary: #ff6900;
   --neutral: #c5c6c7;
-  --neutral-dark: #6b6b6b;
+  --neutral-dark: #56596f;
   --background-main: #fff;
   --background-fore: #f5f6ff;
   --text: #172038;
@@ -18,40 +18,125 @@
 
 html {
   scroll-behavior: smooth;
-}
-
-body {
-  background: var(--background-main);
-  height: 100vh;
+  font-size: 1.5;
 }
 
 h1 {
-  color: var(--primary);
-  font-family: 'Oswald', sans-serif;
+  color: var(--text);
+  font-family: "IBM Plex Sans", sans-serif;
+  font-weight: 700;
+  font-size: 56px;
+  line-height: 70px;
+  letter-spacing: 1px;
 }
 
-h3 {
+h3,
+label {
   color: var(--text);
-  font-family: 'Oswald', sans-serif;
+  font-family: "Open Sans", sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.65px;
+  line-height: 24px;
+}
+
+label {
+  font-weight: 500;
+}
+
+p,
+ul,
+textarea {
+  color: var(--text);
+  font-family: "PTSerifRegular", serif;
+  font-size: 18px;
+  letter-spacing: 0.18px;
 }
 
 p {
-  color: var(--text);
-  font-family: 'Lora', sans-serif;
+  line-height: 27px;
 }
 
-.App {
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content {
+  flex-grow: 1;
   display: flex;
 }
 
+div#sidebar {
+  flex-grow: 1;
+}
+
+div#main {
+  flex-grow: 2;
+}
+
+div#raffle,
+div#home {
+  min-width: 66vw;
+  min-height: calc(100vh - 128px);
+}
+
+div#header {
+  flex-grow: 0;
+
+  background-color: var(--primary);
+  height: 64px;
+  padding-left: 32px;
+  padding-right: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+div#header img {
+  height: 66%;
+}
+
+div#header h1 {
+  color: white;
+  font-size: 1rem;
+  letter-spacing: 2px;
+}
+
+.github {
+  background-color: var(--text);
+  color: #fff;
+  transition: 0.25s;
+
+  font-family: "Open Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 2.625px;
+  line-height: 24px;
+
+  padding: 12px;
+  text-decoration: none;
+}
+
+.github:hover {
+  color: #fff;
+  background-color: #50558b;
+  transition: 200ms;
+}
+
+.invisible {
+  opacity: 0;
+}
+
 @media (orientation: portrait) {
-  .App {
+  .content {
     flex-direction: column;
   }
 
-  div#sidebar, div#raffle, div#home {
+  div#sidebar,
+  div#main {
     width: 100%;
-    height: 100%;
+    height: calc(100vh - 64px);
   }
 
   div#main {
