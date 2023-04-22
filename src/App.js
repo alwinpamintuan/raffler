@@ -1,6 +1,7 @@
 import { AppContextProvider } from "./context/AppContext";
 import Sidebar from "./components/Sidebar/Sidebar";
 import Main from "./components/Main/Main";
+import { Signature } from "./components/Signature/Signature";
 import "./App.css";
 import logo from "./assets/logowhite.png";
 
@@ -24,6 +25,7 @@ function App() {
           <Sidebar />
           <Main />
         </div>
+        <Signature />
       </div>
     </AppContextProvider>
   );
