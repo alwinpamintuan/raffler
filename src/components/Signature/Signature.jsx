@@ -1,17 +1,24 @@
 import React from "react";
-import "./Signature.css";
-
 export function Signature() {
   return (
-    <div className="signature">
+    <footer className="site-footer">
+      <div>
+        <strong>RAFFLER</strong>
+        <span>
+          An affectionate parody in honor of{" "}
+          <a href="https://www.rappler.com/" target="_blank" rel="noreferrer">
+            Rappler
+          </a>
+          . Independently made; unaffiliated.
+        </span>
+      </div>
       <a
         href="https://github.com/alwinpamintuan/"
-        className="copyright"
         target="_blank"
-        rel="noopener noreferrer"
+        rel="noreferrer"
       >
-        🏃‍♂️💨 🦖
+        Made by Alwin Pamintuan ↗
       </a>
-    </div>
+    </footer>
   );
 }

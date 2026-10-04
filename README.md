@@ -1,70 +1,46 @@
-# Getting Started with Create React App
+# Raffler — the raffle edition
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+An affectionate raffle parody in honor of [Rappler](https://www.rappler.com/). Independently made and unaffiliated. Built with React 17 and Create React App; deployed under `/raffler/` on GitHub Pages.
 
-## Available Scripts
+## Run locally
 
-In the project directory, you can run:
+```sh
+npm ci
+npm start
+```
 
-### `npm start`
+For the production preview, including offline behavior and the deployed base path:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```sh
+npm run build
+npm run preview
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Open http://localhost:4173/raffler/. Stop the preview with Ctrl+C. `PORT` overrides its default port.
 
-### `npm test`
+## Raffle workflow
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Add participants individually, paste names on separate lines, or import `.txt` / `.csv` files. Imports show a preview before adding to the existing pool.
+- CSV requires a `name` header and optionally `tickets`. Quoted commas, escaped quotes, and multiline fields are supported. Counts must be positive whole numbers. Imports are limited to 1 MB / 10,000 rows; the pool supports up to 1,000,000 tickets.
+- Choose **One ticket per name** to ignore repetitions and CSV counts. Choose **Combine repeats into tickets** to add repeated names and CSV weights together. Existing names keep their spelling and stable ID. Matching ignores case and surrounding spaces.
+- Edit each participant's ticket count for additional chances. Every ticket has equal probability, using Web Crypto with rejection sampling; animation does not determine the outcome.
+- A winner can lose all their tickets, one ticket, or no tickets. Draw one winner at a time, with a three-second reveal or instant mode. Reduced-motion preference also skips suspense.
+- Undo restores the last draw's exact pool and removes its result. Editing the pool or clearing history invalidates Undo. Clearing history does not restore removed participants.
+- Copy results or export CSV. Presentation mode hides setup; fullscreen is available in supporting browsers. Escape exits presentation.
 
-### `npm run build`
+## Saved sessions and offline use
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Saving is **manual** and local to the current browser and device. Refresh starts a fresh raffle. Use **Save session**, then **Saved → Load** to continue later. A saved edition includes the eligible pool, draw rules, and winner history; transient animation and Undo are not stored. Updating, saving a copy, renaming, and deleting are explicit actions. Loading over unsaved changes requires confirmation.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+The postbuild step stamps the service worker with the build's asset-manifest hash, so every changed build installs a new offline cache. Completed installation caches the application shell and hashed assets. After one completed online visit, it can reopen offline. External Google Fonts use system fallbacks offline; there are no remote raffle APIs. Browser storage or cache restrictions may prevent saving or offline use, but the online raffle remains usable.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Verification
 
-### `npm run eject`
+```sh
+npm test -- --watchAll=false --runInBand
+npm run build
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Tests cover imports, duplicates, weighted selection boundaries, all removal policies, undo, repeated draws, locking and timer cleanup, manual session persistence, storage errors, copy/export, presentation, and service worker caching and isolation. Browser review covers desktop, tablet, 375px mobile, imports, session loading, presentation, and offline reopening.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Publishing is separate: `npm run deploy` builds and publishes to the existing GitHub Pages branch. It is not run during local implementation or verification.

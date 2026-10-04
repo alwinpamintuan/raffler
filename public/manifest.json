@@ -1,12 +1,12 @@
 {
-  "name": "Raffler: A Simple Randomizer",
+  "name": "Raffler: The Raffle Edition",
   "short_name": "Raffler",
-  "theme_color": "#f69435",
-  "background_color": "#ffffff",
+  "theme_color": "#ff5f1b",
+  "background_color": "#f5f5fd",
   "display": "standalone",
   "scope": "/raffler/",
   "start_url": "/raffler/",
-  "prefer_related_applications": true,
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "maskable_icon.png",
