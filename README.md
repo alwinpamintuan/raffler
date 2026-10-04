@@ -43,4 +43,10 @@ npm run build
 
 Tests cover imports, duplicates, weighted selection boundaries, all removal policies, undo, repeated draws, locking and timer cleanup, manual session persistence, storage errors, copy/export, presentation, and service worker caching and isolation. Browser review covers desktop, tablet, 375px mobile, imports, session loading, presentation, and offline reopening.
 
-Publishing is separate: `npm run deploy` builds and publishes to the existing GitHub Pages branch. It is not run during local implementation or verification.
+## GitHub Actions and publishing
+
+[Test and deploy Raffler](https://github.com/alwinpamintuan/raffler/actions/workflows/pages.yml) runs on pull requests and pushes to `main`, with a manual **Run workflow** option. It installs locked dependencies with Node.js 24, runs the tests, and builds the `/raffler/` production application, including the versioned offline worker. Pull requests only validate; successful builds on `main` deploy to [GitHub Pages](https://alwinpamintuan.github.io/raffler/).
+
+Pages uses **GitHub Actions** as its deployment source. Deployment uses GitHub's artifact and short-lived token authentication; no personal access token or repository secret is required. Only the deployment job has Pages write permissions. Actions are pinned to immutable commits, with weekly grouped Dependabot updates. Deployments are serialized, while superseded pull request checks can be cancelled.
+
+The older `npm run deploy` command only updates the legacy `gh-pages` branch and is no longer the publishing route. Local builds and previews do not publish; pushing to `main` does.
