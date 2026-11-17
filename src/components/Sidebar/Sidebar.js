@@ -1,17 +1,24 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { AppContext } from "../../context/AppContext";
 import {
   createId,
+  previewImport,
+  mergeParticipants,
   MAX_TICKETS,
   nameKey,
   ticketTotal,
   validateTickets,
 } from "../../lib/raffle";
 import Icon from "../Icon";
-import Dialog, { ConfirmDialog } from "../Dialog";
+import { ConfirmDialog } from "../Dialog";
 import ImportDialog from "../ImportDialog";
-
-function ParticipantRow({ participant, onUpdate, onRemove, disabled }) {
+function ParticipantRow({
+  participant,
+  onUpdate,
+  onRemove,
+  disabled,
+  showTickets,
+}) {
   const [name, setName] = useState(participant.name),
     [tickets, setTickets] = useState(String(participant.tickets));
   useEffect(() => {
@@ -23,7 +30,12 @@ function ParticipantRow({ participant, onUpdate, onRemove, disabled }) {
       setName(participant.name);
       return;
     }
-    if (!onUpdate({ ...participant, name: name.trim() }))
+    if (
+      !onUpdate({
+        ...participant,
+        name: name.trim(),
+      })
+    )
       setName(participant.name);
   };
   const commitTickets = () => {
@@ -31,7 +43,10 @@ function ParticipantRow({ participant, onUpdate, onRemove, disabled }) {
       const value = validateTickets(tickets);
       if (
         value !== participant.tickets &&
-        !onUpdate({ ...participant, tickets: value })
+        !onUpdate({
+          ...participant,
+          tickets: value,
+        })
       )
         setTickets(String(participant.tickets));
       else setTickets(String(value));
@@ -55,20 +70,22 @@ function ParticipantRow({ participant, onUpdate, onRemove, disabled }) {
           if (event.key === "Enter") event.currentTarget.blur();
         }}
       />
-      <input
-        type="number"
-        min="1"
-        max={MAX_TICKETS}
-        step="1"
-        aria-label={`Tickets for ${participant.name}`}
-        value={tickets}
-        disabled={disabled}
-        onChange={(event) => setTickets(event.target.value)}
-        onBlur={commitTickets}
-        onKeyDown={(event) => {
-          if (event.key === "Enter") event.currentTarget.blur();
-        }}
-      />
+      {showTickets && (
+        <input
+          type="number"
+          min="1"
+          max={MAX_TICKETS}
+          step="1"
+          aria-label={`Tickets for ${participant.name}`}
+          value={tickets}
+          disabled={disabled}
+          onChange={(event) => setTickets(event.target.value)}
+          onBlur={commitTickets}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") event.currentTarget.blur();
+          }}
+        />
+      )}
       <button
         className="icon-button"
         disabled={disabled}
@@ -80,15 +97,49 @@ function ParticipantRow({ participant, onUpdate, onRemove, disabled }) {
     </li>
   );
 }
-
 export default function Sidebar() {
   const { state, dispatch, tab, setTab } = useContext(AppContext);
   const [query, setQuery] = useState(""),
     [limit, setLimit] = useState(50),
     [modal, setModal] = useState(null),
-    [newName, setNewName] = useState(""),
-    [newTickets, setNewTickets] = useState("1"),
-    [error, setError] = useState("");
+    [text, setText] = useState(""),
+    [mode, setMode] = useState("unique"),
+    [showTickets, setShowTickets] = useState(false);
+  const preview = useMemo(() => {
+    try {
+      const result = previewImport(text, "text", mode);
+      const existingNames = new Set(
+        state.participants.map((person) => nameKey(person.name)),
+      );
+      return {
+        ...result,
+        combined: mergeParticipants(
+          state.participants,
+          result.participants,
+          mode,
+        ),
+        duplicates:
+          result.duplicates +
+          result.participants.filter((person) =>
+            existingNames.has(nameKey(person.name)),
+          ).length,
+      };
+    } catch (error) {
+      return {
+        error: error.message,
+        participants: [],
+      };
+    }
+  }, [text, mode, state.participants]);
+  const addNames = (event) => {
+    event.preventDefault();
+    if (locked || preview.error || !preview.participants.length) return;
+    dispatch({
+      type: "PARTICIPANTS",
+      participants: preview.combined,
+    });
+    setText("");
+  };
   const locked = state.phase === "drawing";
   const filtered = state.participants.filter((item) =>
     nameKey(item.name).includes(nameKey(query)),
@@ -96,11 +147,17 @@ export default function Sidebar() {
   useEffect(() => setLimit(50), [query]);
   const update = (participant, message) => {
     if (!participant) {
-      dispatch({ type: "NOTICE", message });
+      dispatch({
+        type: "NOTICE",
+        message,
+      });
       return false;
     }
     if (!participant.name) {
-      dispatch({ type: "NOTICE", message: "Every participant needs a name." });
+      dispatch({
+        type: "NOTICE",
+        message: "Every participant needs a name.",
+      });
       return false;
     }
     if (
@@ -127,155 +184,207 @@ export default function Sidebar() {
       });
       return false;
     }
-    dispatch({ type: "PARTICIPANTS", participants });
+    dispatch({
+      type: "PARTICIPANTS",
+      participants,
+    });
     return true;
-  };
-  const add = (event) => {
-    event.preventDefault();
-    setError("");
-    const name = newName.trim();
-    if (!name) {
-      setError("Enter a participant name.");
-      return;
-    }
-    if (
-      state.participants.some((item) => nameKey(item.name) === nameKey(name))
-    ) {
-      setError(
-        "That name is already listed. Edit their ticket count to add chances.",
-      );
-      return;
-    }
-    try {
-      const tickets = validateTickets(newTickets);
-      if (ticketTotal(state.participants) + tickets > MAX_TICKETS)
-        throw new Error(
-          `The raffle limit is ${MAX_TICKETS.toLocaleString()} tickets.`,
-        );
-      dispatch({
-        type: "PARTICIPANTS",
-        participants: [
-          ...state.participants,
-          { id: createId(), name, tickets },
-        ],
-      });
-      setModal(null);
-    } catch (err) {
-      setError(err.message);
-    }
   };
   return (
     <section
       id="entries-panel"
+      tabIndex={-1}
       role="tabpanel"
-      aria-labelledby="entries-tab"
-      className={`entries-panel panel ${tab === "entries" ? "mobile-active" : ""}`}
+      aria-labelledby="names-heading"
+      className={`entries-panel ${tab === "entries" ? "mobile-active" : ""}`}
     >
-      <div className="section-heading">
-        <span className="section-number">01</span>
-        <h2>The entry desk</h2>
-        <span className="count-badge">
-          {state.participants.length.toLocaleString()}
-        </span>
-      </div>
-      <p className="panel-intro">
-        A name. A ticket. A chance to make the headline.
-      </p>
-      <button
-        className="button secondary full-width"
-        disabled={locked}
-        onClick={() => setModal("import")}
-      >
-        <Icon name="upload" />
-        Paste or import entries
-      </button>
-      <div className="entry-summary">
-        <strong>
-          {ticketTotal(state.participants).toLocaleString()}{" "}
-          <span>tickets in the pool</span>
-        </strong>
-        <Icon name="ticket" />
-      </div>
-      <p className="hint">
-        More tickets = more chances. Edit a count to give someone extra entries.
-      </p>
-      <div className="search-field">
-        <Icon name="search" />
-        <input
-          type="search"
-          aria-label="Search participants"
-          placeholder="Find a participant"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-        />
-      </div>
-      <div className="participant-labels">
-        <span>Participant</span>
-        <span>Tickets</span>
-        <span />
-      </div>
-      {state.participants.length === 0 ? (
-        <div className="entries-empty">
-          <span className="empty-number">0</span>
-          <p>The guest list is open.</p>
-          <small>Add a name or bring your whole list.</small>
-        </div>
-      ) : filtered.length === 0 ? (
-        <p className="list-empty">
-          No names match “{query}”. Everyone is still eligible.
-        </p>
-      ) : (
-        <ul className="participant-list">
-          {filtered.slice(0, limit).map((participant) => (
-            <ParticipantRow
-              key={participant.id}
-              participant={participant}
-              disabled={locked}
-              onUpdate={update}
-              onRemove={(id) =>
-                dispatch({
-                  type: "PARTICIPANTS",
-                  participants: state.participants.filter(
-                    (item) => item.id !== id,
-                  ),
-                })
-              }
-            />
-          ))}
-        </ul>
-      )}
-      {filtered.length > limit && (
-        <button
-          className="text-button full-width"
-          onClick={() => setLimit(limit + 50)}
-        >
-          Show 50 more · {filtered.length.toLocaleString()} matching
-        </button>
-      )}
-      <div className="entry-list-actions">
-        <button
-          className="text-button"
+      <h2 id="names-heading">Add names</h2>
+      <form onSubmit={addNames}>
+        <label className="field-label" htmlFor="participant-names">
+          Names
+        </label>
+        <textarea
+          id="participant-names"
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+          rows={5}
           disabled={locked}
-          onClick={() => {
-            setNewName("");
-            setNewTickets("1");
-            setError("");
-            setModal("add");
-          }}
-        >
-          <Icon name="plus" />
-          Add participant
-        </button>
+          placeholder={"Maria Santos\nJuan Cruz\nAna Reyes"}
+          aria-describedby="names-hint names-preview"
+        />
+        <p className="hint" id="names-hint">
+          One name per line.
+        </p>
+        <div id="names-preview" className="inline-preview" aria-live="polite">
+          {text.trim() &&
+            (preview.error ? (
+              <p className="form-error" role="alert">
+                {preview.error}
+              </p>
+            ) : (
+              <p>
+                {preview.participants.length.toLocaleString()}{" "}
+                {preview.participants.length === 1 ? "name" : "names"} to add
+                {preview.duplicates
+                  ? ` · ${preview.duplicates} repeated ${preview.duplicates === 1 ? "name" : "names"} ${mode === "unique" ? "ignored" : "combined"}`
+                  : ""}
+              </p>
+            ))}
+        </div>
+        <div className="entry-add-actions">
+          <button
+            className="button secondary"
+            type="submit"
+            disabled={
+              locked || Boolean(preview.error) || !preview.participants.length
+            }
+          >
+            <Icon name="plus" />
+            Add names
+          </button>
+          <button
+            className="text-button"
+            type="button"
+            disabled={locked}
+            onClick={() => setModal("import")}
+          >
+            <Icon name="upload" />
+            Import file
+          </button>
+        </div>
+        <details className="entry-options">
+          <summary>Entry options</summary>
+          <fieldset className="simple-options" disabled={locked}>
+            <legend className="visually-hidden">Repeated names</legend>
+            <label className="checkbox-label">
+              <input
+                type="radio"
+                name="inline-duplicates"
+                checked={mode === "unique"}
+                onChange={() => setMode("unique")}
+              />
+              <span>
+                One ticket per name<small>Ignore repeated names.</small>
+              </span>
+            </label>
+            <label className="checkbox-label">
+              <input
+                type="radio"
+                name="inline-duplicates"
+                checked={mode === "tickets"}
+                onChange={() => setMode("tickets")}
+              />
+              <span>
+                Combine repeats into tickets
+                <small>Each repeat adds a chance.</small>
+              </span>
+            </label>
+          </fieldset>
+        </details>
+      </form>
+      {!state.participants.length && !state.winners.length && (
         <button
-          className="text-button muted"
-          disabled={locked || !state.participants.length}
-          onClick={() => setModal("clear")}
+          className="text-button sample-button"
+          disabled={locked}
+          onClick={() =>
+            dispatch({
+              type: "PARTICIPANTS",
+              participants: [
+                "Maria Santos",
+                "Juan Cruz",
+                "Ana Reyes",
+                "Paolo Garcia",
+                "Bea Torres",
+                "Miguel Ramos",
+              ].map((name) => ({
+                id: createId(),
+                name,
+                tickets: 1,
+              })),
+            })
+          }
         >
-          Clear
+          Try sample entries
+          <Icon name="arrow" />
         </button>
-      </div>
-      <div className="draw-settings">
-        <h3 className="eyebrow">Draw rules</h3>
+      )}
+      {state.participants.length > 0 && (
+        <div className="entry-list">
+          <div className="list-toolbar">
+            <h3>Participants</h3>
+            <button
+              className="text-button"
+              aria-pressed={showTickets}
+              disabled={locked}
+              onClick={() => setShowTickets(!showTickets)}
+            >
+              Edit tickets
+            </button>
+          </div>
+          <div className="search-field">
+            <Icon name="search" />
+            <input
+              type="search"
+              aria-label="Search participants"
+              placeholder="Find a name"
+              value={query}
+              disabled={locked}
+              onChange={(event) => setQuery(event.target.value)}
+            />
+          </div>
+          {showTickets && (
+            <div className="participant-labels">
+              <span>Name</span>
+              <span>Tickets</span>
+              <span />
+            </div>
+          )}
+          {filtered.length === 0 ? (
+            <p className="list-empty">
+              No names match “{query}”. Everyone is still eligible.
+            </p>
+          ) : (
+            <ul
+              className={`participant-list ${showTickets ? "editing-tickets" : ""}`}
+            >
+              {filtered.slice(0, limit).map((participant) => (
+                <ParticipantRow
+                  key={participant.id}
+                  participant={participant}
+                  disabled={locked}
+                  showTickets={showTickets}
+                  onUpdate={update}
+                  onRemove={(id) =>
+                    dispatch({
+                      type: "PARTICIPANTS",
+                      participants: state.participants.filter(
+                        (item) => item.id !== id,
+                      ),
+                    })
+                  }
+                />
+              ))}
+            </ul>
+          )}
+          {filtered.length > limit && (
+            <button
+              className="text-button"
+              onClick={() => setLimit(limit + 50)}
+            >
+              Show 50 more · {filtered.length.toLocaleString()} matching
+            </button>
+          )}
+          <button
+            className="text-button muted clear-entries"
+            disabled={locked}
+            onClick={() => setModal("clear")}
+          >
+            Clear names
+          </button>
+        </div>
+      )}
+      <details className="draw-settings">
+        <summary>Draw options</summary>
         <label className="field-label" htmlFor="removal-policy">
           After a win
           <select
@@ -285,12 +394,14 @@ export default function Sidebar() {
             onChange={(event) =>
               dispatch({
                 type: "SETTINGS",
-                settings: { removal: event.target.value },
+                settings: {
+                  removal: event.target.value,
+                },
               })
             }
           >
             <option value="participant">
-              Remove participant & all tickets
+              Remove participant &amp; all tickets
             </option>
             <option value="ticket">Remove the winning ticket only</option>
             <option value="keep">Keep all tickets in the pool</option>
@@ -298,10 +409,10 @@ export default function Sidebar() {
         </label>
         <p className="hint">
           {state.settings.removal === "participant"
-            ? "Everyone can win once."
+            ? "Each participant can win once."
             : state.settings.removal === "ticket"
               ? "Remaining tickets can win again."
-              : "Every draw uses the same pool; repeats can win."}
+              : "Repeat winners are possible."}
         </p>
         <label className="checkbox-label">
           <input
@@ -311,7 +422,9 @@ export default function Sidebar() {
             onChange={(event) =>
               dispatch({
                 type: "SETTINGS",
-                settings: { instant: event.target.checked },
+                settings: {
+                  instant: event.target.checked,
+                },
               })
             }
           />
@@ -319,71 +432,31 @@ export default function Sidebar() {
             Instant reveal<small>Skip the three-second suspense.</small>
           </span>
         </label>
-      </div>
-      <button
-        className="button primary mobile-draw-link"
-        disabled={!state.participants.length || locked}
-        onClick={() => setTab("draw")}
-      >
-        Ready? Go to the draw
-        <Icon name="arrow" />
-      </button>
+      </details>
+      {state.participants.length > 0 && (
+        <button
+          className="button primary mobile-draw-link"
+          disabled={locked}
+          onClick={() => setTab("draw")}
+        >
+          Go to draw
+          <Icon name="arrow" />
+        </button>
+      )}
       {modal === "import" && <ImportDialog onClose={() => setModal(null)} />}
       {modal === "clear" && (
         <ConfirmDialog
-          title="Clear the entry desk?"
-          message="This removes all eligible participants and invalidates Undo. Winner history and saved sessions stay available."
-          confirmLabel="Clear entries"
+          title="Clear all names?"
+          message="This removes the eligible names and Undo. Winner history and saved sessions stay available."
+          confirmLabel="Clear names"
+          onConfirm={() =>
+            dispatch({
+              type: "PARTICIPANTS",
+              participants: [],
+            })
+          }
           onClose={() => setModal(null)}
-          onConfirm={() => dispatch({ type: "PARTICIPANTS", participants: [] })}
         />
-      )}
-      {modal === "add" && (
-        <Dialog title="One more chance" onClose={() => setModal(null)}>
-          <form onSubmit={add}>
-            <label className="field-label">
-              Participant name
-              <input
-                data-autofocus
-                value={newName}
-                onChange={(event) => setNewName(event.target.value)}
-                placeholder="e.g. Maria Santos"
-              />
-            </label>
-            <label className="field-label">
-              Tickets
-              <input
-                type="number"
-                min="1"
-                max={MAX_TICKETS}
-                step="1"
-                value={newTickets}
-                onChange={(event) => setNewTickets(event.target.value)}
-              />
-            </label>
-            <p className="hint">
-              Each ticket is an equal chance of being drawn.
-            </p>
-            {error && (
-              <p className="form-error" role="alert">
-                {error}
-              </p>
-            )}
-            <div className="dialog-actions">
-              <button
-                type="button"
-                className="button secondary"
-                onClick={() => setModal(null)}
-              >
-                Cancel
-              </button>
-              <button className="button primary" type="submit">
-                Add participant
-                <Icon name="plus" />
-              </button>
-            </div>
-          </form>
-        </Dialog>
       )}
     </section>
   );

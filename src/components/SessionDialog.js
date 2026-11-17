@@ -10,7 +10,7 @@ export function SaveDialog({ onClose }) {
     [copy, setCopy] = useState(false),
     [error, setError] = useState("");
   return (
-    <Dialog title="Keep this edition" onClose={onClose}>
+    <Dialog title="Save session" onClose={onClose}>
       <form
         onSubmit={(event) => {
           event.preventDefault();
@@ -94,12 +94,12 @@ export default function SessionDialog({ onClose }) {
     <Dialog
       title={
         action?.kind === "rename"
-          ? "Rename this edition"
+          ? "Rename session"
           : action?.kind === "delete"
             ? "Delete saved session?"
             : action?.kind === "load"
               ? "Replace the current raffle?"
-              : "Saved editions"
+              : "Saved sessions"
       }
       onClose={onClose}
     >
@@ -160,10 +160,8 @@ export default function SessionDialog({ onClose }) {
           ) : (
             <div className="session-empty">
               <Icon name="folder" />
-              <h3>No saved editions yet.</h3>
-              <p>
-                Close this window and choose Save session to keep your raffle.
-              </p>
+              <h3>No saved sessions yet.</h3>
+              <p>Close this window and choose Save to keep your raffle.</p>
             </div>
           )}
         </>

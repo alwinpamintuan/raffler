@@ -7,12 +7,20 @@ import SessionDialog, { SaveDialog } from "./components/SessionDialog";
 import { ConfirmDialog } from "./components/Dialog";
 import { Signature } from "./components/Signature/Signature";
 import Icon from "./components/Icon";
-import logo from "./assets/logowhite.png";
+import emblem from "./assets/raffler-mark.svg";
 import "./App.css";
-
 function Newsroom() {
-  const { state, dispatch, tab, setTab, presenting, setPresenting, sessions } =
-    useContext(AppContext);
+  const {
+    state,
+    dispatch,
+    tab,
+    setTab,
+    presenting,
+    setPresenting,
+    sessions,
+    announcement,
+  } = useContext(AppContext);
+  const [activeSection, setActiveSection] = useState("draw-panel");
   const [modal, setModal] = useState(null),
     [fullscreen, setFullscreen] = useState(false);
   const presentRef = useRef(null),
@@ -22,6 +30,7 @@ function Newsroom() {
   useEffect(() => {
     const key = (event) => {
       if (event.key === "Escape" && !modal) {
+        if (presenting) window.setTimeout(() => presentRef.current?.focus(), 0);
         setPresenting(false);
         if (document.fullscreenElement)
           document.exitFullscreen?.().catch(() => {});
@@ -29,7 +38,10 @@ function Newsroom() {
     };
     const change = () => {
       setFullscreen(Boolean(document.fullscreenElement));
-      if (!document.fullscreenElement) setPresenting(false);
+      if (!document.fullscreenElement) {
+        setPresenting(false);
+        if (presenting) window.setTimeout(() => presentRef.current?.focus(), 0);
+      }
     };
     document.addEventListener("keydown", key);
     document.addEventListener("fullscreenchange", change);
@@ -37,15 +49,16 @@ function Newsroom() {
       document.removeEventListener("keydown", key);
       document.removeEventListener("fullscreenchange", change);
     };
-  }, [setPresenting, modal]);
+  }, [setPresenting, modal, presenting]);
   useEffect(() => {
     if (presenting) fullscreenRef.current?.focus();
   }, [presenting]);
   useEffect(() => {
+    if (state.phase === "drawing") setActiveSection("draw-panel");
     if (state.phase === "drawing")
-      document
-        .getElementById("draw-panel")
-        ?.scrollIntoView?.({ block: "start" });
+      document.getElementById("draw-panel")?.scrollIntoView?.({
+        block: "start",
+      });
   }, [state.phase]);
   const togglePresentation = () => {
     setPresenting(!presenting);
@@ -79,129 +92,144 @@ function Newsroom() {
     if (focus) tabRefs.current[key]?.focus();
   };
   const tabs = [
-    ["entries", "Entries", state.participants.length],
-    ["draw", "Draw", state.nextDrawNumber],
-    ["winners", "Winners", state.winners.length],
+    ["entries", "Names"],
+    ["draw", "Draw"],
   ];
+  const navigateTo = (section) => {
+    setActiveSection(section);
+    setTab(section === "entries-panel" ? "entries" : "draw");
+    window.setTimeout(() => {
+      const target = document.getElementById(section);
+      target?.focus();
+      target?.scrollIntoView?.({ block: "start" });
+    }, 0);
+  };
+  const openRaffleDialog = (event, kind) => {
+    const menu = event.currentTarget.closest("details");
+    menu.open = false;
+    menu.querySelector("summary").focus();
+    setModal(kind);
+  };
   return (
     <div className={`app ${presenting ? "presentation" : ""}`}>
       <a href="#workspace" className="skip-link">
         Skip to raffle
       </a>
-      <header className="masthead">
-        <div className="masthead-inner">
-          <a
-            href={process.env.PUBLIC_URL + "/"}
-            className="wordmark"
-            aria-label="Raffler home"
-          >
-            RAFFLER<span>A LITTLE LUCK. A BIG HEADLINE.</span>
-          </a>
-          <img className="brand-mark" src={logo} alt="Raffler mark" />
-          <div className="masthead-links">
-            <a href="https://www.rappler.com/" target="_blank" rel="noreferrer">
-              THE INSPIRATION
-              <Icon name="arrow" />
-            </a>
-            <a
-              href="https://github.com/alwinpamintuan/raffler"
-              target="_blank"
-              rel="noreferrer"
-              className="github-link"
+      <header className="app-header">
+        <div className="masthead-start">
+          {!presenting && (
+            <details className="raffle-menu">
+              <summary>Raffle</summary>
+              <div className="raffle-menu-items">
+                <button
+                  disabled={locked}
+                  onClick={(event) => openRaffleDialog(event, "sessions")}
+                >
+                  Saved sessions <span>{sessions.length}</span>
+                </button>
+                <button
+                  disabled={locked}
+                  onClick={(event) => openRaffleDialog(event, "new")}
+                >
+                  New raffle
+                </button>
+              </div>
+            </details>
+          )}
+        </div>
+        <a
+          href={process.env.PUBLIC_URL + "/"}
+          className="wordmark"
+          aria-label="Raffler home"
+        >
+          <img src={emblem} alt="" width="44" height="44" />
+          <span>RAFFLER</span>
+        </a>
+        <div className="toolbar">
+          {!presenting && (
+            <button
+              className="button masthead-save"
+              disabled={locked}
+              onClick={() => setModal("save")}
             >
-              GITHUB
-              <Icon name="arrow" />
-            </a>
-          </div>
+              <Icon name="save" />
+              Save
+            </button>
+          )}
+          <button
+            ref={presentRef}
+            className="button navy"
+            onClick={togglePresentation}
+          >
+            <Icon name={presenting ? "close" : "screen"} />
+            {presenting ? "Exit presentation" : "Present"}
+          </button>
+          {presenting && (
+            <button
+              ref={fullscreenRef}
+              className="button masthead-save"
+              onClick={toggleFullscreen}
+            >
+              <Icon name="expand" />
+              {fullscreen ? "Exit fullscreen" : "Fullscreen"}
+            </button>
+          )}
         </div>
       </header>
-      <div className="edition-bar">
-        <span className="eyebrow">
-          THE RAFFLE EDITION <span className="edition-separator">/</span>{" "}
-          <span className="edition-subtitle">EVERYONE HAS A SHOT</span>
-        </span>
-        <span className="edition-label">An affectionate parody</span>
-      </div>
-      <main id="workspace" tabIndex={-1}>
-        <div className="workspace-heading">
-          <div>
-            <span className="eyebrow orange">THE NEWSROOM OF CHANCE</span>
-            <h1>
-              {presenting
-                ? "The stage is yours."
-                : "Let luck make the headline."}
-            </h1>
-          </div>
-          <div className="toolbar">
-            {!presenting && (
-              <>
-                <button
-                  className="button secondary"
-                  disabled={locked}
-                  onClick={() => setModal("sessions")}
-                >
-                  <Icon name="folder" />
-                  <span>
-                    Saved
-                    <span className="toolbar-count">{sessions.length}</span>
-                  </span>
-                </button>
-                <button
-                  className="button secondary"
-                  disabled={locked}
-                  onClick={() => setModal("save")}
-                >
-                  <Icon name="save" />
-                  Save session
-                </button>
-              </>
-            )}
-            <button
-              ref={presentRef}
-              className="button navy"
-              onClick={togglePresentation}
+      {!presenting && (
+        <nav className="edition-nav" aria-label="Raffle navigation">
+          <div className="edition-nav-inner">
+            <a
+              href="#draw-panel"
+              aria-current={
+                activeSection === "draw-panel" ? "location" : undefined
+              }
+              onClick={(event) => {
+                event.preventDefault();
+                navigateTo("draw-panel");
+              }}
             >
-              <Icon name={presenting ? "close" : "screen"} />
-              {presenting ? "Exit presentation" : "Present"}
-            </button>
-            {presenting && (
-              <button
-                ref={fullscreenRef}
-                className="button secondary"
-                onClick={toggleFullscreen}
-              >
-                <Icon name="expand" />
-                {fullscreen ? "Exit fullscreen" : "Fullscreen"}
-              </button>
-            )}
+              Live draw
+            </a>
+            <a
+              href="#entries-panel"
+              aria-current={
+                activeSection === "entries-panel" ? "location" : undefined
+              }
+              onClick={(event) => {
+                event.preventDefault();
+                navigateTo("entries-panel");
+              }}
+            >
+              Names
+            </a>
+            <a
+              href="#winners-panel"
+              aria-current={
+                activeSection === "winners-panel" ? "location" : undefined
+              }
+              onClick={(event) => {
+                event.preventDefault();
+                navigateTo("winners-panel");
+              }}
+            >
+              Winners
+            </a>
+            <span>The raffle edition</span>
           </div>
-        </div>
+        </nav>
+      )}
+      <main id="workspace" tabIndex={-1}>
         {!presenting && (
-          <div className="session-bar">
-            <span className="session-state">
-              <span className={state.dirty ? "unsaved-dot" : "secure-dot"} />
-              {state.sessionName || "Untitled raffle"}
-              <span className="session-state-detail">
-                {state.dirty
-                  ? "Unsaved changes"
-                  : state.savedId
-                    ? "Saved on this device"
-                    : "New session"}
-              </span>
+          <div className="session-info">
+            <h1>{state.sessionName || "Untitled raffle"}</h1>
+            <span>
+              {state.dirty
+                ? "Unsaved changes · Save before leaving"
+                : state.savedId
+                  ? "Saved on this device"
+                  : "Save manually to keep your raffle"}
             </span>
-            <div>
-              <span className="save-hint">
-                Save manually to keep progress after a refresh.
-              </span>
-              <button
-                className="text-button"
-                disabled={locked}
-                onClick={() => setModal("new")}
-              >
-                <Icon name="plus" />
-                New raffle
-              </button>
-            </div>
           </div>
         )}
         {!presenting && (
@@ -210,7 +238,7 @@ function Newsroom() {
             role="tablist"
             aria-label="Raffle sections"
           >
-            {tabs.map(([key, label, count], index) => (
+            {tabs.map(([key, label], index) => (
               <button
                 key={key}
                 ref={(element) => {
@@ -218,7 +246,9 @@ function Newsroom() {
                 }}
                 id={`${key}-tab`}
                 role="tab"
-                aria-controls={`${key}-panel`}
+                aria-controls={
+                  key === "draw" ? "stage-workspace" : "entries-panel"
+                }
                 aria-selected={tab === key}
                 tabIndex={tab === key ? 0 : -1}
                 onClick={() => selectTab(key)}
@@ -229,26 +259,36 @@ function Newsroom() {
                     )
                   ) {
                     event.preventDefault();
-                    const next =
-                      event.key === "Home"
-                        ? 0
-                        : event.key === "End"
-                          ? 2
-                          : (index + (event.key === "ArrowRight" ? 1 : 2)) % 3;
-                    selectTab(tabs[next][0], true);
+                    selectTab(
+                      tabs[
+                        event.key === "Home"
+                          ? 0
+                          : event.key === "End"
+                            ? 1
+                            : (index + 1) % 2
+                      ][0],
+                      true,
+                    );
                   }
                 }}
               >
                 {label}
-                <span>{count.toLocaleString()}</span>
               </button>
             ))}
           </nav>
         )}
         <div className="newsroom-grid">
+          <div
+            id="stage-workspace"
+            className={`stage-workspace ${tab === "draw" ? "mobile-active" : ""}`}
+            role="tabpanel"
+            aria-labelledby="draw-tab"
+            aria-label="Draw and results"
+          >
+            <Main key={`${state.workspaceId}-draw`} />
+            {!presenting && <Winners key={`${state.workspaceId}-winners`} />}
+          </div>
           {!presenting && <Sidebar key={`${state.workspaceId}-entries`} />}
-          <Main key={`${state.workspaceId}-draw`} />
-          {!presenting && <Winners key={`${state.workspaceId}-winners`} />}
         </div>
       </main>
       <Signature />
@@ -258,9 +298,7 @@ function Newsroom() {
         aria-live="polite"
         aria-atomic="true"
       >
-        {state.phase !== "drawing" && state.winners.length
-          ? `Winner announced. Draw ${state.winners[state.winners.length - 1].number}: ${state.winners[state.winners.length - 1].name}.`
-          : ""}
+        {announcement}
       </div>
       <div
         className="notice-wrap"
@@ -276,7 +314,12 @@ function Newsroom() {
               className="icon-button"
               aria-label="Dismiss notification"
               disabled={locked}
-              onClick={() => dispatch({ type: "NOTICE", message: "" })}
+              onClick={() =>
+                dispatch({
+                  type: "NOTICE",
+                  message: "",
+                })
+              }
             >
               <Icon name="close" />
             </button>
@@ -287,11 +330,13 @@ function Newsroom() {
       {modal === "sessions" && <SessionDialog onClose={() => setModal(null)} />}
       {modal === "new" && (
         <ConfirmDialog
-          title="Start a fresh edition?"
+          title="Start a new raffle?"
           message="This clears the current entry pool, draw rules, and winner history. Unsaved changes will be lost. Your saved sessions stay available."
           confirmLabel="New raffle"
           onConfirm={() => {
-            dispatch({ type: "NEW" });
+            dispatch({
+              type: "NEW",
+            });
             setTab("entries");
           }}
           onClose={() => setModal(null)}

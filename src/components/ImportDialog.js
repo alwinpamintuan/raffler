@@ -62,7 +62,7 @@ export default function ImportDialog({ onClose }) {
     event.target.value = "";
   };
   return (
-    <Dialog title="Bring everyone into the draw" onClose={onClose} wide>
+    <Dialog title="Import names" onClose={onClose} wide>
       <p className="dialog-description">
         Paste a list or import a file. You’ll review it before anything changes.
       </p>
@@ -118,35 +118,42 @@ export default function ImportDialog({ onClose }) {
           ? "Headers: name and optional tickets. Quoted fields are supported."
           : "Each nonempty line is an entry. Extra spaces are trimmed."}
       </p>
-      <fieldset className="import-options">
-        <legend>How should chances work?</legend>
-        <label className={`radio-card ${mode === "unique" ? "selected" : ""}`}>
-          <input
-            type="radio"
-            name="duplicate-mode"
-            value="unique"
-            checked={mode === "unique"}
-            onChange={() => setMode("unique")}
-          />
-          <span>
-            <strong>One ticket per name</strong>
-            <small>Ignore repeats and imported ticket counts.</small>
-          </span>
-        </label>
-        <label className={`radio-card ${mode === "tickets" ? "selected" : ""}`}>
-          <input
-            type="radio"
-            name="duplicate-mode"
-            value="tickets"
-            checked={mode === "tickets"}
-            onChange={() => setMode("tickets")}
-          />
-          <span>
-            <strong>Combine repeats into tickets</strong>
-            <small>Repeated names and ticket counts add extra chances.</small>
-          </span>
-        </label>
-      </fieldset>
+      <details className="import-details">
+        <summary>Entry options</summary>
+        <fieldset className="import-options">
+          <legend>How should chances work?</legend>
+          <label
+            className={`radio-card ${mode === "unique" ? "selected" : ""}`}
+          >
+            <input
+              type="radio"
+              name="duplicate-mode"
+              value="unique"
+              checked={mode === "unique"}
+              onChange={() => setMode("unique")}
+            />
+            <span>
+              <strong>One ticket per name</strong>
+              <small>Ignore repeats and imported ticket counts.</small>
+            </span>
+          </label>
+          <label
+            className={`radio-card ${mode === "tickets" ? "selected" : ""}`}
+          >
+            <input
+              type="radio"
+              name="duplicate-mode"
+              value="tickets"
+              checked={mode === "tickets"}
+              onChange={() => setMode("tickets")}
+            />
+            <span>
+              <strong>Combine repeats into tickets</strong>
+              <small>Repeated names and ticket counts add extra chances.</small>
+            </span>
+          </label>
+        </fieldset>
+      </details>
       {(fileError || preview.error) && (
         <p role="alert" className="form-error">
           {fileError || preview.error}

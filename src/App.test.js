@@ -25,12 +25,24 @@ afterEach(() => {
   jest.restoreAllMocks();
   jest.useRealTimers();
 });
-const samples = () =>
+const openTickets = () => {
+  if (
+    screen
+      .getByRole("button", { name: "Edit tickets" })
+      .getAttribute("aria-pressed") !== "true"
+  )
+    fireEvent.click(screen.getByRole("button", { name: "Edit tickets" }));
+};
+const openSaved = () => {
+  fireEvent.click(screen.getByText("Raffle", { exact: true }));
+  fireEvent.click(screen.getByRole("button", { name: /Saved sessions/ }));
+};
+const samples = () => {
   fireEvent.click(screen.getByRole("button", { name: /Try sample entries/ }));
+  openTickets();
+};
 const saveSession = (name) => {
-  fireEvent.click(
-    screen.getByRole("button", { name: "Save session", exact: true }),
-  );
+  fireEvent.click(screen.getByRole("button", { name: "Save", exact: true }));
   const dialog = screen.getByRole("dialog");
   fireEvent.change(within(dialog).getByLabelText("Session name"), {
     target: { value: name },
@@ -38,16 +50,17 @@ const saveSession = (name) => {
   fireEvent.click(within(dialog).getByRole("button", { name: "Save session" }));
 };
 
-test("renders the newsroom and preview applies imports only on request", () => {
+test("file preview applies imports only on request", () => {
   render(<App />);
   expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-    "Let luck make the headline.",
+    "Untitled raffle",
   );
-  fireEvent.click(screen.getByRole("button", { name: /Paste or import/ }));
+  fireEvent.click(screen.getByRole("button", { name: "Import file" }));
   const dialog = screen.getByRole("dialog");
   fireEvent.change(within(dialog).getByLabelText("Participant names"), {
     target: { value: "Ana\nANA\nBea" },
   });
+  fireEvent.click(within(dialog).getByText("Entry options"));
   fireEvent.click(
     within(dialog).getByLabelText(/Combine repeats into tickets/),
   );
@@ -58,6 +71,7 @@ test("renders the newsroom and preview applies imports only on request", () => {
   fireEvent.click(
     within(dialog).getByRole("button", { name: /Add to raffle/ }),
   );
+  openTickets();
   expect(screen.getByLabelText("Tickets for Ana")).toHaveValue(2);
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 });
@@ -72,20 +86,20 @@ test("draw locks setup, switches to Draw, reveals once, removes winner and suppo
     "true",
   );
   expect(screen.getByLabelText("Tickets for Maria Santos")).toBeDisabled();
-  expect(
-    screen.getByRole("button", { name: /Drawing the headline/ }),
-  ).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Drawing…" })).toBeDisabled();
   act(() => jest.advanceTimersByTime(3120));
-  expect(screen.getByText("WINNER ANNOUNCED")).toBeInTheDocument();
+  expect(screen.getByText("Winner announced")).toBeInTheDocument();
   expect(
     screen.queryByLabelText("Tickets for Maria Santos"),
   ).not.toBeInTheDocument();
   expect(
-    screen.getByRole("heading", { name: "Maria Santos", level: 2 }),
+    screen.getByRole("heading", { name: "Maria Santos wins Draw 1", level: 2 }),
   ).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: "Undo last draw" }));
   expect(screen.getByLabelText("Tickets for Maria Santos")).toHaveValue(1);
-  expect(screen.getByText("No headlines. Yet.")).toBeInTheDocument();
+  expect(
+    screen.getByText("Your winners will appear here."),
+  ).toBeInTheDocument();
 });
 
 test("instant and reduced-motion draws finish without a suspense timer", () => {
@@ -98,7 +112,7 @@ test("instant and reduced-motion draws finish without a suspense timer", () => {
   render(<App />);
   samples();
   fireEvent.click(screen.getByRole("button", { name: "Draw a winner" }));
-  expect(screen.getByText("WINNER ANNOUNCED")).toBeInTheDocument();
+  expect(screen.getByText("Winner announced")).toBeInTheDocument();
   expect(jest.getTimerCount()).toBe(0);
 });
 
@@ -133,10 +147,11 @@ test("saving is manual; refresh is empty and loading restores a saved session", 
   expect(
     screen.queryByLabelText("Tickets for Maria Santos"),
   ).not.toBeInTheDocument();
-  fireEvent.click(screen.getByRole("button", { name: /Saved/ }));
+  openSaved();
   fireEvent.click(
     within(screen.getByRole("dialog")).getByRole("button", { name: "Load" }),
   );
+  openTickets();
   expect(screen.getByLabelText("Tickets for Maria Santos")).toHaveValue(1);
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 });
@@ -145,7 +160,7 @@ test("rename and deletion are explicit, and deletion keeps the open raffle", () 
   render(<App />);
   samples();
   saveSession("Friday");
-  fireEvent.click(screen.getByRole("button", { name: /Saved/ }));
+  openSaved();
   fireEvent.click(screen.getByRole("button", { name: /Rename Friday/ }));
   fireEvent.change(screen.getByLabelText("Session name"), {
     target: { value: "Saturday" },
@@ -175,12 +190,13 @@ test("loading over unsaved changes requires an explicit replace", () => {
     target: { value: "7" },
   });
   fireEvent.blur(screen.getByLabelText("Tickets for Maria Santos"));
-  fireEvent.click(screen.getByRole("button", { name: /Saved/ }));
+  openSaved();
   fireEvent.click(screen.getByRole("button", { name: "Load" }));
   expect(screen.getByRole("dialog")).toHaveAccessibleName(
     "Replace the current raffle?",
   );
   fireEvent.click(screen.getByRole("button", { name: "Replace and load" }));
+  openTickets();
   expect(screen.getByLabelText("Tickets for Maria Santos")).toHaveValue(1);
 });
 
@@ -214,19 +230,17 @@ test("invalid ticket edit reverts safely; search never changes the eligible pool
 
 test("copy/export feedback and final winner survive an exhausted pool", async () => {
   render(<App />);
-  fireEvent.click(screen.getByRole("button", { name: "Add participant" }));
-  fireEvent.change(screen.getByLabelText("Participant name"), {
+  fireEvent.change(screen.getByLabelText("Names"), {
     target: { value: "Ana" },
   });
-  fireEvent.click(
-    within(screen.getByRole("dialog")).getByRole("button", {
-      name: "Add participant",
-    }),
-  );
+  fireEvent.click(screen.getByRole("button", { name: "Add names" }));
+  fireEvent.click(screen.getByText("Draw options"));
   fireEvent.click(screen.getByLabelText(/Instant reveal/));
   fireEvent.click(screen.getByRole("button", { name: "Draw a winner" }));
   expect(
-    screen.getByText("That’s a wrap. The pool is empty."),
+    screen.getByText(
+      "The last name is in. Add more names to keep the story going.",
+    ),
   ).toBeInTheDocument();
   Object.defineProperty(navigator, "clipboard", {
     configurable: true,
@@ -251,7 +265,7 @@ test("copy/export feedback and final winner survive an exhausted pool", async ()
 
 test("presentation exits with Escape and dialogs return focus to their trigger", () => {
   render(<App />);
-  const trigger = screen.getByRole("button", { name: "Save session" });
+  const trigger = screen.getByRole("button", { name: "Save" });
   trigger.focus();
   fireEvent.click(trigger);
   expect(screen.getByLabelText("Session name")).toHaveFocus();
@@ -259,7 +273,7 @@ test("presentation exits with Escape and dialogs return focus to their trigger",
   expect(trigger).toHaveFocus();
   fireEvent.click(screen.getByRole("button", { name: "Present" }));
   expect(
-    screen.queryByRole("heading", { name: "The entry desk" }),
+    screen.queryByRole("heading", { name: "Add names" }),
   ).not.toBeInTheDocument();
   fireEvent.keyDown(document, { key: "Escape" });
   expect(screen.getByRole("button", { name: "Present" })).toBeInTheDocument();
@@ -298,11 +312,139 @@ test("a new raffle resets participant search and local editor state", () => {
   fireEvent.change(screen.getByLabelText("Search participants"), {
     target: { value: "nobody" },
   });
+  fireEvent.click(screen.getByText("Raffle", { exact: true }));
   fireEvent.click(screen.getByRole("button", { name: "New raffle" }));
   fireEvent.click(
-    within(screen.getByRole("dialog")).getByRole("button", { name: "New raffle" }),
+    within(screen.getByRole("dialog")).getByRole("button", {
+      name: "New raffle",
+    }),
   );
-  expect(screen.getByLabelText("Search participants")).toHaveValue("");
+  expect(screen.getByLabelText("Names")).toHaveValue("");
   samples();
+  expect(screen.getByLabelText("Search participants")).toHaveValue("");
   expect(screen.getByLabelText("Tickets for Maria Santos")).toHaveValue(1);
+});
+
+test("inline names preview is explicit, ignores duplicates, and discloses tickets", () => {
+  render(<App />);
+  fireEvent.change(screen.getByLabelText("Names"), {
+    target: { value: "Ana\nANA\nBea" },
+  });
+  expect(
+    screen.getByText(/2 names to add.*1 repeated name ignored/),
+  ).toBeInTheDocument();
+  expect(screen.queryByLabelText("Name for Ana")).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Add names" }));
+  expect(screen.getByLabelText("Name for Ana")).toHaveValue("Ana");
+  expect(screen.queryByLabelText("Tickets for Ana")).not.toBeInTheDocument();
+  openTickets();
+  expect(screen.getByLabelText("Tickets for Ana")).toHaveValue(1);
+  fireEvent.change(screen.getByLabelText("Names"), {
+    target: { value: "ANA\nCara" },
+  });
+  fireEvent.click(screen.getByText("Entry options"));
+  fireEvent.click(screen.getByLabelText(/Combine repeats into tickets/));
+  fireEvent.click(screen.getByRole("button", { name: "Add names" }));
+  expect(screen.getByLabelText("Tickets for Ana")).toHaveValue(2);
+  expect(screen.getByLabelText("Name for Cara")).toHaveValue("Cara");
+});
+
+test("suspense decelerates, holds, and celebrates once without replay on load or undo", () => {
+  jest.useFakeTimers();
+  render(<App />);
+  samples();
+  fireEvent.click(screen.getByRole("button", { name: "Draw a winner" }));
+  act(() => jest.advanceTimersByTime(2600));
+  const heldName = document.querySelector(".winner-name").textContent;
+  expect(screen.queryByTestId("confetti")).not.toBeInTheDocument();
+  act(() => jest.advanceTimersByTime(399));
+  expect(document.querySelector(".winner-name")).toHaveTextContent(heldName);
+  expect(screen.queryByText("Winner announced")).not.toBeInTheDocument();
+  act(() => jest.advanceTimersByTime(1));
+  expect(screen.getByTestId("confetti")).toBeInTheDocument();
+  expect(
+    screen.getByRole("heading", { name: "Maria Santos wins Draw 1", level: 2 }),
+  ).toBeInTheDocument();
+  expect(window.crypto.getRandomValues).toHaveBeenCalledTimes(1);
+  fireEvent.click(screen.getByRole("button", { name: "Present" }));
+  expect(screen.getByTestId("confetti")).toBeInTheDocument();
+  act(() => jest.advanceTimersByTime(1200));
+  expect(screen.queryByTestId("confetti")).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Exit presentation" }));
+  saveSession("After draw");
+  openSaved();
+  fireEvent.click(screen.getByRole("button", { name: "Load" }));
+  expect(screen.queryByTestId("confetti")).not.toBeInTheDocument();
+  expect(
+    document.querySelector('.visually-hidden[role="status"]'),
+  ).toHaveTextContent("");
+  fireEvent.click(screen.getByRole("button", { name: "Draw next winner" }));
+  act(() => jest.advanceTimersByTime(3000));
+  expect(screen.getByTestId("confetti")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Undo last draw" }));
+  expect(screen.queryByTestId("confetti")).not.toBeInTheDocument();
+});
+
+test("instant mode skips suspense and confetti", () => {
+  jest.useFakeTimers();
+  render(<App />);
+  samples();
+  fireEvent.click(screen.getByText("Draw options"));
+  fireEvent.click(screen.getByLabelText(/Instant reveal/));
+  fireEvent.click(screen.getByRole("button", { name: "Draw a winner" }));
+  expect(screen.getByText("Winner announced")).toBeInTheDocument();
+  expect(screen.queryByTestId("confetti")).not.toBeInTheDocument();
+  expect(jest.getTimerCount()).toBe(0);
+});
+
+test("front-page navigation reaches the draw, names, and winner feed", () => {
+  jest.useFakeTimers();
+  render(<App />);
+  const navigation = screen.getByRole("navigation", {
+    name: "Raffle navigation",
+  });
+  fireEvent.click(within(navigation).getByRole("link", { name: "Live draw" }));
+  act(() => jest.runOnlyPendingTimers());
+  expect(screen.getByRole("region", { name: "Live draw" })).toHaveFocus();
+  expect(screen.getByRole("tab", { name: "Draw" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  fireEvent.click(within(navigation).getByRole("link", { name: "Names" }));
+  expect(
+    within(navigation).getByRole("link", { name: "Names" }),
+  ).toHaveAttribute("aria-current", "location");
+  act(() => jest.runOnlyPendingTimers());
+  expect(screen.getByRole("tabpanel", { name: "Add names" })).toHaveFocus();
+  fireEvent.click(within(navigation).getByRole("link", { name: "Winners" }));
+  act(() => jest.runOnlyPendingTimers());
+  expect(screen.getByRole("region", { name: "Latest winners" })).toHaveFocus();
+  expect(screen.getByRole("tab", { name: "Draw" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+});
+
+test("single eligible name is explicit and an exhausted headline stays complete", () => {
+  jest.useFakeTimers();
+  render(<App />);
+  const name = "Alexandria-Maria De Los Santos Villanueva";
+  fireEvent.change(screen.getByLabelText("Names"), { target: { value: name } });
+  fireEvent.click(
+    screen.getByRole("button", { name: "Add names", exact: true }),
+  );
+  expect(
+    screen.getByText(/Only one participant is eligible/),
+  ).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Draw a winner" }));
+  act(() => jest.advanceTimersByTime(3000));
+  expect(
+    screen.getByRole("heading", { name: `${name} wins Draw 1`, level: 2 }),
+  ).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Add more names" }));
+  act(() => jest.advanceTimersByTime(0));
+  expect(screen.getByLabelText("Names")).toHaveFocus();
+  expect(
+    screen.getByRole("heading", { name: `${name} wins Draw 1`, level: 2 }),
+  ).toBeInTheDocument();
 });

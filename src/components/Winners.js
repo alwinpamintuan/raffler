@@ -3,9 +3,8 @@ import { AppContext } from "../context/AppContext";
 import { resultsCSV, resultsText } from "../lib/raffle";
 import { ConfirmDialog } from "./Dialog";
 import Icon from "./Icon";
-
 export default function Winners() {
-  const { state, dispatch, tab } = useContext(AppContext);
+  const { state, dispatch } = useContext(AppContext);
   const [confirm, setConfirm] = useState(false),
     [limit, setLimit] = useState(50);
   const locked = state.phase === "drawing",
@@ -39,7 +38,10 @@ export default function Winners() {
       link.click();
       link.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-      dispatch({ type: "NOTICE", message: "Winner results exported as CSV." });
+      dispatch({
+        type: "NOTICE",
+        message: "Winner results exported as CSV.",
+      });
     } catch {
       dispatch({
         type: "NOTICE",
@@ -50,50 +52,33 @@ export default function Winners() {
   return (
     <section
       id="winners-panel"
-      role="tabpanel"
-      aria-labelledby="winners-tab"
-      className={`winners-panel panel ${tab === "winners" ? "mobile-active" : ""}`}
+      tabIndex={-1}
+      aria-labelledby="winners-heading"
+      className="winners-panel"
     >
-      <div className="section-heading">
-        <span className="section-number">03</span>
-        <h2>The winners</h2>
-        <span className="count-badge">
-          {state.winners.length.toLocaleString()}
-        </span>
-      </div>
-      <p className="panel-intro">Good news travels. Keep the record here.</p>
-      <div className="result-actions">
-        <button
-          className="button secondary"
-          disabled={empty || locked}
-          onClick={copy}
-        >
-          <Icon name="copy" />
-          Copy
-        </button>
-        <button
-          className="button secondary"
-          disabled={empty || locked}
-          onClick={download}
-        >
-          <Icon name="download" />
-          Export CSV
-        </button>
+      <div className="results-heading">
+        <h2 id="winners-heading">
+          Latest winners{!empty && <span>{state.winners.length}</span>}
+        </h2>
+        {!empty && (
+          <div className="result-actions">
+            <button className="text-button" disabled={locked} onClick={copy}>
+              <Icon name="copy" />
+              Copy
+            </button>
+            <button
+              className="text-button"
+              disabled={locked}
+              onClick={download}
+            >
+              <Icon name="download" />
+              Export CSV
+            </button>
+          </div>
+        )}
       </div>
       {empty ? (
-        <div className="winners-empty">
-          <div className="empty-lines" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-          <h3>No headlines. Yet.</h3>
-          <p>
-            The first winner will land here.
-            <br />
-            Stay tuned.
-          </p>
-        </div>
+        <p className="winners-empty">Your winners will appear here.</p>
       ) : (
         <ol className="winner-list">
           {[...state.winners]
@@ -104,15 +89,12 @@ export default function Winners() {
                 key={winner.id}
                 className={index === 0 ? "latest-winner" : ""}
               >
-                <div className="winner-list-label">
-                  <span>
-                    {index === 0
-                      ? "LATEST WINNER"
-                      : `DRAW ${String(winner.number).padStart(2, "0")}`}
-                  </span>
-                  <span>#{String(winner.number).padStart(2, "0")}</span>
-                </div>
-                <h3>{winner.name}</h3>
+                <span className="result-number">
+                  {String(winner.number).padStart(2, "0")}
+                </span>
+                <h3>
+                  {winner.name} wins Draw {winner.number}
+                </h3>
                 <time dateTime={winner.drawnAt}>
                   {new Date(winner.drawnAt).toLocaleString(undefined, {
                     month: "short",
@@ -130,25 +112,26 @@ export default function Winners() {
           Show 50 more winners
         </button>
       )}
-      <button
-        className="text-button history-clear muted"
-        disabled={empty || locked}
-        onClick={() => setConfirm(true)}
-      >
-        <Icon name="trash" />
-        Clear history
-      </button>
-      <div className="history-note">
-        <span className="eyebrow">A NOTE FROM THE DESK</span>
-        <p>A little luck. A lot of possibility.</p>
-        <span>Save your session to keep the story after a refresh.</span>
-      </div>
+      {!empty && (
+        <button
+          className="text-button history-clear muted"
+          disabled={locked}
+          onClick={() => setConfirm(true)}
+        >
+          <Icon name="trash" />
+          Clear history
+        </button>
+      )}
       {confirm && (
         <ConfirmDialog
           title="Clear winner history?"
           message="This clears the current results and Undo. Eligible tickets and saved sessions stay unchanged."
           confirmLabel="Clear history"
-          onConfirm={() => dispatch({ type: "CLEAR_HISTORY" })}
+          onConfirm={() =>
+            dispatch({
+              type: "CLEAR_HISTORY",
+            })
+          }
           onClose={() => setConfirm(false)}
         />
       )}

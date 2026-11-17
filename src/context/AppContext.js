@@ -13,7 +13,6 @@ import {
   sessionData,
 } from "../lib/raffle";
 import { readSessions, writeSessions } from "../lib/sessions";
-
 const AppContext = React.createContext(null);
 function AppContextProvider({ children }) {
   const [state, dispatch] = useReducer(raffleReducer, undefined, initialState);
@@ -21,7 +20,18 @@ function AppContextProvider({ children }) {
   const [tab, setTab] = useState("entries");
   const [presenting, setPresenting] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [revealId, setRevealId] = useState(null);
+  const [announcement, setAnnouncement] = useState("");
   const busy = useRef(false);
+  useEffect(() => {
+    setRevealId(null);
+    setAnnouncement("");
+  }, [state.workspaceId]);
+  useEffect(() => {
+    if (!revealId) return;
+    const timer = window.setTimeout(() => setRevealId(null), 1200);
+    return () => window.clearTimeout(timer);
+  }, [revealId]);
   useEffect(() => {
     try {
       setSessions(readSessions());
@@ -43,38 +53,65 @@ function AppContextProvider({ children }) {
       busy.current = false;
       return;
     }
-    const finish = () =>
+    const finish = () => {
+      const id = createId();
+      if (!state.settings.instant && !reducedMotion) setRevealId(id);
+      setAnnouncement(
+        `Winner announced. Draw ${state.nextDrawNumber}: ${state.draw.winner.name}.`,
+      );
       dispatch({
         type: "FINISH",
-        id: createId(),
+        id,
         drawnAt: new Date().toISOString(),
       });
+    };
     if (state.settings.instant || reducedMotion) {
       finish();
       return;
     }
+    // A single deadline-based timer: quick cycling, deceleration, then a held beat.
+    const beats = [
+      80, 160, 240, 320, 400, 480, 560, 640, 720, 800, 900, 1000, 1120, 1260,
+      1420, 1610, 1830, 2080, 2350, 2600, 3000,
+    ];
     const started = Date.now();
-    const timer = window.setInterval(() => {
-      if (Date.now() - started >= 3000) {
-        window.clearInterval(timer);
+    let timer;
+    const tick = (index) => {
+      if (Date.now() - started >= 3000 || index === beats.length - 1) {
         finish();
-      } else
-        dispatch({
-          type: "FRAME",
-          frame: Math.floor((Date.now() - started) / 120),
-        });
-    }, 120);
-    return () => window.clearInterval(timer);
+        return;
+      }
+      dispatch({
+        type: "FRAME",
+        frame: index + 1,
+      });
+      timer = window.setTimeout(
+        () => tick(index + 1),
+        Math.max(0, beats[index + 1] - (Date.now() - started)),
+      );
+    };
+    timer = window.setTimeout(() => tick(0), beats[0]);
+    return () => window.clearTimeout(timer);
+    // Draw metadata is captured at START; FRAME must not restart this sequence.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.phase, state.settings.instant, reducedMotion]);
   const draw = useCallback(() => {
     if (busy.current || !state.participants.length) return;
     try {
       const winner = chooseWinner(state.participants);
       busy.current = true;
+      setRevealId(null);
+      setAnnouncement("");
       setTab("draw");
-      dispatch({ type: "START", winner });
+      dispatch({
+        type: "START",
+        winner,
+      });
     } catch (error) {
-      dispatch({ type: "ERROR", message: error.message });
+      dispatch({
+        type: "ERROR",
+        message: error.message,
+      });
     }
   }, [state.participants]);
   const persist = (next) => {
@@ -101,24 +138,40 @@ function AppContextProvider({ children }) {
     };
     if (!persist([...sessions.filter((item) => item.id !== id), session]))
       return false;
-    dispatch({ type: "SAVED", id, name: session.name });
+    dispatch({
+      type: "SAVED",
+      id,
+      name: session.name,
+    });
     return true;
   };
   const rename = (id, name) => {
     if (
       !persist(
         sessions.map((item) =>
-          item.id === id ? { ...item, name: name.trim() } : item,
+          item.id === id
+            ? {
+                ...item,
+                name: name.trim(),
+              }
+            : item,
         ),
       )
     )
       return false;
-    dispatch({ type: "RENAMED", id, name: name.trim() });
+    dispatch({
+      type: "RENAMED",
+      id,
+      name: name.trim(),
+    });
     return true;
   };
   const removeSession = (id) => {
     if (!persist(sessions.filter((item) => item.id !== id))) return false;
-    dispatch({ type: "DELETED", id });
+    dispatch({
+      type: "DELETED",
+      id,
+    });
     return true;
   };
   return (
@@ -126,6 +179,9 @@ function AppContextProvider({ children }) {
       value={{
         state,
         dispatch,
+        revealId,
+        reducedMotion,
+        announcement,
         draw,
         sessions,
         save,

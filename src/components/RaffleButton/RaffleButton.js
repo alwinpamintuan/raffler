@@ -10,11 +10,10 @@ export default function RaffleButton() {
       disabled={drawing || !state.participants.length}
       onClick={draw}
     >
-      <Icon name="ticket" />
       {drawing
-        ? "Drawing the headline…"
+        ? "Drawing…"
         : state.winners.length
-          ? "Draw the next winner"
+          ? "Draw next winner"
           : "Draw a winner"}
       <Icon name="arrow" />
     </button>

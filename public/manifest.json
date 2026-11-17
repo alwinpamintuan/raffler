@@ -2,7 +2,7 @@
   "name": "Raffler: The Raffle Edition",
   "short_name": "Raffler",
   "theme_color": "#ff5f1b",
-  "background_color": "#f5f5fd",
+  "background_color": "#f5f6ff",
   "display": "standalone",
   "scope": "/raffler/",
   "start_url": "/raffler/",

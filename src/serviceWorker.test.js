@@ -50,6 +50,7 @@ function worker() {
         css: "/raffler/static/css/main.hash.css",
         map: "/raffler/static/js/main.hash.js.map",
         logo: "/raffler/static/media/logo.hash.png",
+        font: "/raffler/static/media/ibm-plex-sans.hash.woff2",
       },
     }),
   }));
@@ -96,6 +97,7 @@ test("install precaches the shell and all hashed assets but not sourcemaps", asy
       "https://example.test/raffler/static/js/main.hash.js",
       "https://example.test/raffler/static/css/main.hash.css",
       "https://example.test/raffler/static/media/logo.hash.png",
+      "https://example.test/raffler/static/media/ibm-plex-sans.hash.woff2",
     ]),
   );
   expect(
