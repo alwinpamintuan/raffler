@@ -11,6 +11,7 @@ const types = {
   ".png": "image/png",
   ".ico": "image/x-icon",
   ".svg": "image/svg+xml",
+  ".woff2": "font/woff2",
 };
 const server = http.createServer((request, response) => {
   const url = new URL(request.url, "http://localhost");
@@ -48,5 +49,7 @@ const server = http.createServer((request, response) => {
   });
 });
 server.listen(Number(process.env.PORT || 4173), "127.0.0.1", () =>
-  console.log("Production preview: http://localhost:4173/raffler/"),
+  console.log(
+    `Production preview: http://localhost:${process.env.PORT || 4173}/raffler/`,
+  ),
 );
